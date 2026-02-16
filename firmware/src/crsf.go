@@ -1,8 +1,8 @@
 //go:build crsf
 // +build crsf
-
 package main
 
+//import ("time")  //trug
 // CRSF (Crossfire) protocol receiver implementation
 // Used by TBS Crossfire and ExpressLRS for RC link
 
@@ -19,8 +19,8 @@ const (
 	// We'll use the number of channels from config.go
 	CRSF_NUM_CHANNELS = NumChannels
 
-	CRSF_CHANNEL_VALUE_MIN = 172  // 987us
-	CRSF_CHANNEL_VALUE_MAX = 1811 // 2012us
+	CRSF_CHANNEL_VALUE_MIN = 174  // 987us - 172
+	CRSF_CHANNEL_VALUE_MAX = 1811 // 2012us - 1811
 
 	// ELRS=420000 CRSF=416666 Radiomaster/ELRS=115200???
 	// TBS says to use 416666 as this is and has been the standard for CRSF
@@ -63,7 +63,8 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 
 		if uart.Buffered() <= CRSF_PACKET_SIZE {
 			// wait for full packet in buffer
-			time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
+			//time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
+		
 			continue
 		}
 

@@ -9,7 +9,7 @@ package main
 // --- Protocol Settings ---
 const (
 	// Number of supported RC channels
-	NumChannels = 18
+	NumChannels = 12 // trug elrs 50hz packet rate, wide switch mode = 12ch
 )
 
 // --- Receiver Configuration ---
@@ -20,6 +20,7 @@ const (
 	ElevatorChannel = 1 // CH2
 	ThrottleChannel = 2 // CH3
 	ArmChannel      = 4 // CH5
+	ManualModeChannel = 6 // CH7
 )
 
 // --- PWM Configuration ---
@@ -36,24 +37,26 @@ const (
 	DEADBAND = 10
 
 	// High Rx channel value for arming/calibration
-	HIGH_RX_VALUE = 1800
+	HIGH_RX_VALUE = 1790 // trug arm channel is maxing at 1792
 )
 
 // --- Flight Control Parameters ---
 const (
 	// Maximum desired pitch rate in degrees/sec
-	MAX_PITCH_RATE_DEG = 200
+	MAX_PITCH_RATE_DEG = 600 //trug 200
 
 	// Maximum desired roll rate in degrees/sec
 	MAX_ROLL_RATE_DEG = 600
 
 	// Weighting for combining gyro/accel with input
-	PID_WEIGHT = 0.5
+	PID_WEIGHT = 1//trug 0.5
 
 	// LPF alpha for gyro/accel fusion
 	LPF_ALPHA = 0.2
 
 	// PID gains (P, I, D) for the pitch and roll controllers
-	pP, pI, pD = 1., 0.1, 0.01
-	rP, rI, rD = 1., 0.1, 0.01
+	//pP, pI, pD = 1., 0.1, 0.01  //trug defaults
+	//rP, rI, rD = 1., 0.1, 0.01
+	pP, pI, pD = 2., 0.5, 0.01
+	rP, rI, rD = 2., 0.5, 0.01
 )
