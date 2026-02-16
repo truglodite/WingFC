@@ -1,0 +1,49 @@
+name: TinyGo CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TINYGO_VERSION: 0.27.0
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl tar
+
+      - name: Install TinyGo
+        run: |
+          curl -sSL https://github.com/tinygo-org/tinygo/releases/download/v${TINYGO_VERSION}/tinygo_${TINYGO_VERSION}_linux_amd64.tar.gz -o /tmp/tinygo.tar.gz
+          sudo tar -C /usr/local -xzf /tmp/tinygo.tar.gz
+          sudo ln -sf /usr/local/tinygo/bin/tinygo /usr/local/bin/tinygo
+          tinygo version
+
+      - name: Run host tests
+        run: |
+          go test ./...
+
+      - name: Build CRSF firmware (artifact)
+        working-directory: firmware/src
+        run: |
+          mkdir -p ../../build
+          tinygo build -o ../../build/wingfc-crsf.uf2 -target=xiao-ble -tags=crsf .
+
+      - name: Build iBus firmware (artifact)
+        working-directory: firmware/src
+        run: |
+          mkdir -p ../../build
+          tinygo build -o ../../build/wingfc-ibus.uf2 -target=xiao-ble -tags=ibus .
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tinygo-builds
+          path: build/

@@ -40,9 +40,9 @@ var (
 	accelXSum, accelYSum, accelZSum, accelBiasX, accelBiasY, accelBiasZ float64 = 0., 0., 0., 0., 0., 0.
 	gyroXSum, gyroYSum, gyroZSum, gyroBiasX, gyroBiasY, gyroBiasZ       float64 = 0., 0., 0., 0., 0., 0.
 	xA, yA, zA, xG, yG, zG                                              int32
-	desiredPitchRate, desiredRollRate		                    float64
-	pitchOutput, rollOutput				                    float64
-	escPulse							    uint32
+	desiredPitchRate, desiredRollRate                                   float64
+	pitchOutput, rollOutput                                             float64
+	escPulse                                                            uint32
 
 	// RC Channels
 	Channels        [NumChannels]uint16
@@ -50,7 +50,7 @@ var (
 	LastPacketTime  time.Time
 	calibStartTime  time.Time
 	armed           bool
-	manualMode	bool
+	manualMode      bool
 	err             error
 )
 
@@ -65,8 +65,8 @@ const (
 	MAX_PULSE_WIDTH_US = 2000
 
 	// RC Receiver channel value constants trug
-	MIN_RX_VALUE     = CRSF_CHANNEL_VALUE_MIN//988
-	MAX_RX_VALUE     = CRSF_CHANNEL_VALUE_MAX//2012
+	MIN_RX_VALUE     = CRSF_CHANNEL_VALUE_MIN //988
+	MAX_RX_VALUE     = CRSF_CHANNEL_VALUE_MAX //2012
 	NEUTRAL_RX_VALUE = 1500
 
 	// Calculated constants for PID control
@@ -244,7 +244,7 @@ func main() {
 					println("Armed!")
 					armed = true
 				}
-				
+
 				// Check for manual mode every loop
 				if Channels[ManualModeChannel] <= HIGH_RX_VALUE {
 					println("Stab Mode")
@@ -265,24 +265,12 @@ func main() {
 				// Use the Kalman filter to fuse sensor data and get a stable attitude estimate.
 				kf.Predict(imuData.GyroX, imuData.GyroY)
 				kf.Update(imuData.Pitch, imuData.Roll)
-				
+
 				// Trug: In case near crash disarm we may still want directional control.
 				// In armed mode, use RC inputs to set desired rates.
-				/*
-				if armed {
-					// Get desired roll and pitch rates from the RC receiver.
-					desiredPitchRate = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
-					desiredRollRate = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
-				} else {
-					// This is disarmed mode, set desired rates to zero... not a good idea?
-					desiredPitchRate = mapRange(NEUTRAL_RX_VALUE, MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
-					desiredRollRate = mapRange(NEUTRAL_RX_VALUE, MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
-				}
-				*/
 				// Get desired roll and pitch rates from the RC receiver.
 				desiredPitchRate = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
 				desiredRollRate = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
-				
 
 				// Apply deadband to avoid small unwanted movements
 				if math.Abs(desiredPitchRate) < DEADBAND*math.Pi/180 {
@@ -301,7 +289,7 @@ func main() {
 					// Update PID controllers and get the control outputs.
 					pitchOutput = pitchPID.Update(pitchError, dt) * PID_WEIGHT
 					rollOutput = rollPID.Update(rollError, dt) * PID_WEIGHT
-				} else {	// use rc inputs if in manual mode
+				} else { // use rc inputs if in manual mode
 					pitchOutput = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
 					rollOutput = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
 				}
@@ -324,11 +312,11 @@ func main() {
 				// Arming engages throttle control Disarming disengages throttle control
 				// Stabilization takes place regardless
 				// In armed mode, set the ESC from ThrottleChannel
-				
+
 				//trug
 				if armed {
 					// Handle ESC signal from ThrottleChannel
-					
+
 					escPulse = uint32(mapRange(float64(Channels[ThrottleChannel]), MIN_RX_VALUE, MAX_RX_VALUE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 				} else {
 					// This is disarmed mode, set ESC to minimum
@@ -339,8 +327,8 @@ func main() {
 				println("Pin,Pout,Rin,Rout, armed")
 				println(desiredPitchRate, pitchOutput, desiredRollRate, rollOutput, armed)
 				println("RX: ele, ail, thr, mode, arm")
-				println(Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel],Channels[ManualModeChannel],Channels[ArmChannel]) // , Channels[ThrottleChannel])
-				
+				println(Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
+
 				println("Left Servo, Right Servo, ESC Servo")
 				println(leftPulse, rightPulse, escPulse)
 				println()
