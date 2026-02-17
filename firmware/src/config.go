@@ -9,17 +9,17 @@ package main
 // --- Protocol Settings ---
 const (
 	// Number of supported RC channels
-	NumChannels = 12 // trug elrs 50hz packet rate, wide switch mode = 12ch
+	NumChannels = 12 // elrs 50hz packet rate, wide switch mode = 12ch
 )
 
 // --- Receiver Configuration ---
 // --- Channel Mappings ---
 
 const (
-	AileronChannel  = 0 // CH1
-	ElevatorChannel = 1 // CH2
-	ThrottleChannel = 2 // CH3
-	ArmChannel      = 4 // CH5
+	AileronChannel    = 0 // CH1
+	ElevatorChannel   = 1 // CH2
+	ThrottleChannel   = 2 // CH3
+	ArmChannel        = 4 // CH5
 	ManualModeChannel = 6 // CH7
 )
 
@@ -49,7 +49,7 @@ const (
 	MAX_ROLL_RATE_DEG = 600
 
 	// Weighting for combining gyro/accel with input
-	PID_WEIGHT = 1//trug 0.5
+	PID_WEIGHT = 1 //trug 0.5
 
 	// LPF alpha for gyro/accel fusion
 	LPF_ALPHA = 0.2

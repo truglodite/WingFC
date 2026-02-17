@@ -1,5 +1,6 @@
 //go:build crsf
 // +build crsf
+
 package main
 
 //import ("time")  //trug
@@ -19,8 +20,8 @@ const (
 	// We'll use the number of channels from config.go
 	CRSF_NUM_CHANNELS = NumChannels
 
-	CRSF_CHANNEL_VALUE_MIN = 174  // 987us - 172
-	CRSF_CHANNEL_VALUE_MAX = 1811 // 2012us - 1811
+	//CRSF_CHANNEL_VALUE_MIN = 174  // 987us - 172
+	//CRSF_CHANNEL_VALUE_MAX = 1811 // 2012us - 1811
 
 	// ELRS=420000 CRSF=416666 Radiomaster/ELRS=115200???
 	// TBS says to use 416666 as this is and has been the standard for CRSF
@@ -64,7 +65,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 		if uart.Buffered() <= CRSF_PACKET_SIZE {
 			// wait for full packet in buffer
 			//time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
-		
+
 			continue
 		}
 
@@ -143,7 +144,7 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 
 	var channelValues [NumChannels]uint16
 	var bitsMerged uint
-	var readValue uint32
+	var readValue int32
 	var readByteIndex uint
 
 	for n := 0; n < NumChannels; n++ {
@@ -154,10 +155,14 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 			}
 			readByte := bitstream[readByteIndex]
 			readByteIndex++
-			readValue |= uint32(readByte) << bitsMerged
+			readValue |= int32(readByte) << bitsMerged
 			bitsMerged += 8
 		}
 		channelValues[n] = uint16(readValue & 0x07FF)
+
+		// Based on CRSF spec, https://github.com/tbs-fpv/tbs-crsf-spec/blob/main/crsf.md#0x16-rc-channels-packed-payload
+		//usec = 1500 + (ticks-992)*5/8
+		channelValues[n] = 1500 + (channelValues[n])*5/8 - (992)*5/8 // probably not ideal
 		readValue >>= 11
 		bitsMerged -= 11
 	}

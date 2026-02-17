@@ -64,9 +64,8 @@ const (
 	MIN_PULSE_WIDTH_US = 1000
 	MAX_PULSE_WIDTH_US = 2000
 
-	// RC Receiver channel value constants trug
-	MIN_RX_VALUE     = CRSF_CHANNEL_VALUE_MIN //988
-	MAX_RX_VALUE     = CRSF_CHANNEL_VALUE_MAX //2012
+	MIN_RX_VALUE     = 988
+	MAX_RX_VALUE     = 2012
 	NEUTRAL_RX_VALUE = 1500
 
 	// Calculated constants for PID control
