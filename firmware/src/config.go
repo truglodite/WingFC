@@ -9,7 +9,10 @@ package main
 // --- Protocol Settings ---
 const (
 	// Number of supported RC channels
-	NumChannels = 12 // elrs 50hz packet rate, wide switch mode = 12ch
+	// elrs 50hz packet rate, wide switch mode = 12ch
+	// elrs 100hz packet rate, wide switch mode = 8ch
+	// elrs packet rates 150hz and higher show crc errors
+	NumChannels = 8
 )
 
 // --- Receiver Configuration ---
@@ -37,7 +40,7 @@ const (
 	DEADBAND = 10
 
 	// High Rx channel value for arming/calibration
-	HIGH_RX_VALUE = 1790 // trug arm channel is maxing at 1792
+	HIGH_RX_VALUE = 2000
 )
 
 // --- Flight Control Parameters ---

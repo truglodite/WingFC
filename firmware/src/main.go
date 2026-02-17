@@ -246,11 +246,11 @@ func main() {
 
 				// Check for manual mode every loop
 				if Channels[ManualModeChannel] <= HIGH_RX_VALUE {
-					println("Stab Mode")
-					manualMode = false
-				} else {
 					println("Manual Mode")
 					manualMode = true
+				} else {
+					println("Stab Mode")
+					manualMode = false
 				}
 
 				// Handle failsafe and manual mode checks within the flight loop

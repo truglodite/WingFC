@@ -129,7 +129,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			} else {
 				println("Checksum mismatch. Discarding packet.")
 			}
-			resetState()
+			resetState()readReceiver
 		}
 	}
 }
