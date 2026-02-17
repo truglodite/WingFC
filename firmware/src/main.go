@@ -78,7 +78,8 @@ const (
 	PWM_CH3_PIN = machine.D2 // ESC (Electronic Speed Controller)
 
 	// Fail-safe constants
-	FAILSAFE_TIMEOUT_MS = 500
+	// for CSRF, we need to wait at least 1second
+	FAILSAFE_TIMEOUT_MS = 1000
 
 	// State machine states
 	CALIBRATION flightState = iota
@@ -101,7 +102,7 @@ func main() {
 	// --- Hardware Setup ---
 	uart.Configure(machine.UARTConfig{
 		BaudRate: BAUD_RATE,
-		TX:       machine.UART_TX_PIN,
+		TX:       machine.NoPin, //crsf doesn't need TX unless we use telemetry
 		RX:       machine.UART_RX_PIN,
 	})
 	println("UART configured for receiver.")
@@ -177,7 +178,7 @@ func main() {
 
 	// --- Watchdog Setup ---
 	watchdog.Configure(machine.WatchdogConfig{
-		TimeoutMillis: 1000, // 1s timeout
+		TimeoutMillis: 2000, // 1.2s timeout, so we don't reset on csrf failsafe?
 	})
 
 	flightState := CALIBRATION
