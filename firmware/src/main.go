@@ -176,13 +176,21 @@ func main() {
 	rollPID = NewPIDController(rP, rI, rD)
 	println("Control system initialized.")
 
+	// Calibrate gyro to find bias
+	println("Initial calibration")
+	println("Calibrating Gyro... Keep gyro still!")
+	// Keep outputs at neutral and ESC at zero
+	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setESC(MIN_PULSE_WIDTH_US)
+	calibrate()
+
 	// --- Watchdog Setup ---
 	watchdog.Configure(machine.WatchdogConfig{
-		TimeoutMillis: 2000, // 1.2s timeout, so we don't reset on csrf failsafe?
+		TimeoutMillis: 1000,
 	})
 
-	flightState := CALIBRATION
-	lastFlightState = CALIBRATION
+	flightState := FLIGHT_MODE
+	lastFlightState = FLIGHT_MODE
 
 	// Start the goroutine to read receiver packets asynchronously.
 	go readReceiver(packetChan)
@@ -220,19 +228,6 @@ func main() {
 
 			// The state machine from previous versions is now the default case
 			switch flightState {
-			case CALIBRATION:
-				// Keep outputs at neutral and ESC at zero
-				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
-				setESC(MIN_PULSE_WIDTH_US)
-
-				// Calibrate gyro to find bias
-				println("Initial calibration")
-				println("Calibrating Gyro... Keep gyro still!")
-				time.Sleep(time.Second)
-				calibrate()
-
-				lastFlightState = flightState
-				flightState = FLIGHT_MODE
 
 			case FLIGHT_MODE:
 				// Switch to armed mode if CH5 is high
@@ -336,6 +331,7 @@ func main() {
 			case FAILSAFE:
 				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 				setESC(MIN_PULSE_WIDTH_US)
+				println("Receiver failsafe")
 
 				if time.Since(LastPacketTime).Milliseconds() <= FAILSAFE_TIMEOUT_MS {
 					lastFlightState = flightState

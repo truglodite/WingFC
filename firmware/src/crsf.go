@@ -3,6 +3,8 @@
 
 package main
 
+import "time"
+
 //import ("time")  //trug
 // CRSF (Crossfire) protocol receiver implementation
 // Used by TBS Crossfire and ExpressLRS for RC link
@@ -63,8 +65,8 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 	for {
 
 		if uart.Buffered() <= CRSF_PACKET_SIZE {
-			// wait for full packet in buffer
-			//time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
+			// wait for full packet in buffer... otherwise we bootloop during failsafe
+			time.Sleep(250 * time.Microsecond)
 
 			continue
 		}
