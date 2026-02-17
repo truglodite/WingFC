@@ -158,11 +158,12 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 			readValue |= int32(readByte) << bitsMerged
 			bitsMerged += 8
 		}
+
 		channelValues[n] = uint16(readValue & 0x07FF)
 
 		// Based on CRSF spec, https://github.com/tbs-fpv/tbs-crsf-spec/blob/main/crsf.md#0x16-rc-channels-packed-payload
 		//usec = 1500 + (ticks-992)*5/8
-		channelValues[n] = 1500 + (channelValues[n])*5/8 - (992)*5/8 // probably not ideal
+		channelValues[n] = 880 + (channelValues[n])*5/8 // probably not ideal
 		readValue >>= 11
 		bitsMerged -= 11
 	}
