@@ -125,7 +125,7 @@ func main() {
 		println("could not get PWM channel 2:", err)
 		return
 	}
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServoPWM(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
 
 	escPWMConfig := machine.PWMConfig{
@@ -180,7 +180,7 @@ func main() {
 	println("Initial calibration")
 	println("Calibrating Gyro... Keep gyro still!")
 	// Keep outputs at neutral and ESC at zero
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServoPWM(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	setESC(MIN_PULSE_WIDTH_US)
 	calibrate()
 
@@ -302,7 +302,7 @@ func main() {
 				rightPulse := uint32(constrain(rightElevon, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 
 				// Set the PWM signals for the servos.
-				setServo(leftPulse, rightPulse)
+				setServoPWM(leftPulse, rightPulse)
 
 				// Arming engages throttle control Disarming disengages throttle control
 				// Stabilization takes place regardless
@@ -329,7 +329,7 @@ func main() {
 				println()
 
 			case FAILSAFE:
-				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+				setServoPWM(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 				setESC(MIN_PULSE_WIDTH_US)
 				println("Receiver failsafe")
 
