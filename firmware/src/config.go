@@ -40,7 +40,7 @@ const (
 	DEADBAND = 10
 
 	// High Rx channel value for arming/calibration
-	HIGH_RX_VALUE = 2000
+	HIGH_RX_VALUE = 1980
 )
 
 // --- Flight Control Parameters ---
