@@ -285,6 +285,8 @@ func main() {
 					pitchOutput = pitchPID.Update(pitchError, dt) * PID_WEIGHT
 					rollOutput = rollPID.Update(rollError, dt) * PID_WEIGHT
 				} else { // use rc inputs if in manual mode
+					pitchPID.integral = 0 // reset integral term in manual mode to prevent windup
+					rollPID.integral = 0  // reset integral term in manual mode to prevent windup
 					pitchOutput = desiredPitchRate
 					rollOutput = desiredRollRate
 				}
