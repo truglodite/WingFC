@@ -210,7 +210,7 @@ func main() {
 			LastPacketTime = time.Now()
 			// A complete packet has been received.
 			processReceiverPacket(packet)
-			// println("Received and processed a new receiver packet.")
+			//println("Received and processed a new receiver packet.")
 
 		default:
 			// Control loop at fixed intervals
@@ -321,14 +321,14 @@ func main() {
 				}
 				setESC(escPulse)
 				// Print status and sensor data for debugging
-				println("Pin,Pout,Rin,Rout, armed")
-				println(desiredPitchRate, pitchOutput, desiredRollRate, rollOutput, armed)
+				//println("    Pin       ,    Pout      ,    Rin       ,     Rout     , armed")
+				//println(desiredPitchRate, pitchOutput, desiredRollRate, rollOutput, armed)
 				println("RX: ele, ail, thr, mode, arm")
-				println(Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
+				println("    ", Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
 
-				println("Left Servo, Right Servo, ESC Servo")
-				println(leftPulse, rightPulse, escPulse)
-				println()
+				//println("Left,Right,ESC")
+				//println(leftPulse, rightPulse, escPulse)
+				//println()
 
 			case FAILSAFE:
 				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)

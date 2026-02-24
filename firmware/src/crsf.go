@@ -3,9 +3,7 @@
 
 package main
 
-import (
-	"time"
-)
+import "time"
 
 // CRSF (Crossfire) protocol receiver implementation
 // Used by TBS Crossfire and ExpressLRS for RC link
@@ -61,6 +59,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 		packet = [CRSF_PACKET_SIZE]byte{}
 		packetIndex = 0
 		state = DESTINATION
+		//println("Resetting CRSF state machine.")
 	}
 
 	for {
@@ -68,12 +67,14 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 		if uart.Buffered() <= CRSF_PACKET_SIZE {
 			// wait for full packet in buffer
 			time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
+			//println(uart.Buffered(), " bytes buffered")
 			continue
 		}
 
 		b, err := uart.ReadByte()
 		if err != nil {
 			// A non-blocking read returns a timeout error. We can simply continue.
+			//println("UART read error:", err)
 			continue
 		}
 
@@ -85,6 +86,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 				packet[packetIndex] = b
 				packetIndex = 1
 				state = LENGTH
+				//println("Awaiting length...")
 			}
 
 		case LENGTH:
@@ -95,6 +97,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 				packet[packetIndex] = length
 				packetIndex++
 				state = TYPE
+				//println("Awaiting type...")
 			} else {
 				resetState()
 				state = DESTINATION // Invalid length, restart.
@@ -106,6 +109,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 				packet[packetIndex] = b
 				packetIndex++
 				state = PAYLOAD
+				//println("Awaiting payload...")
 			} else {
 				resetState()
 				state = DESTINATION // Invalid frametype, restart.
@@ -116,6 +120,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			packet[packetIndex] = b
 			packetIndex++
 			if packetIndex >= length+1 {
+				//println("Awaiting checksum...")
 				state = CHECKSUM
 			}
 
@@ -128,6 +133,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			//  if at all possible try to capture an entire packet here as well
 			if calculatedChecksum == b {
 				packetChan <- packet
+				//println("Received a valid CRSF packet with correct checksum.")
 			} else {
 				println("Checksum mismatch. Discarding packet.")
 			}
