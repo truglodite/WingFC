@@ -102,7 +102,7 @@ func main() {
 	// --- Hardware Setup ---
 	uart.Configure(machine.UARTConfig{
 		BaudRate: BAUD_RATE,
-		TX:       machine.NoPin, //crsf doesn't need TX unless we use telemetry
+		TX:       machine.UART_TX_PIN,
 		RX:       machine.UART_RX_PIN,
 	})
 	println("UART configured for receiver.")
@@ -285,8 +285,8 @@ func main() {
 					pitchOutput = pitchPID.Update(pitchError, dt) * PID_WEIGHT
 					rollOutput = rollPID.Update(rollError, dt) * PID_WEIGHT
 				} else { // use rc inputs if in manual mode
-					pitchOutput = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
-					rollOutput = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
+					pitchOutput = desiredPitchRate
+					rollOutput = desiredRollRate
 				}
 
 				// Combine PID outputs with a mix of raw RC input.

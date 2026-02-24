@@ -52,7 +52,7 @@ const (
 	MAX_ROLL_RATE_DEG = 600
 
 	// Weighting for combining gyro/accel with input
-	PID_WEIGHT = 1 //trug 0.5
+	PID_WEIGHT = .7 //trug 0.5
 
 	// LPF alpha for gyro/accel fusion
 	LPF_ALPHA = 0.2
