@@ -138,7 +138,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 				println(" Received a valid CRSF packet.")
 			} else {
 				print(time.Now().UnixMilli())
-				println(time.Now().UnixMilli(), " Checksum mismatch. Discarding packet.")
+				println(" Checksum mismatch. Discarding packet.")
 			}
 			resetState()
 		}
