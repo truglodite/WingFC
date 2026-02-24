@@ -67,7 +67,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 		if uart.Buffered() <= CRSF_PACKET_SIZE {
 			// wait for full packet in buffer
 			// removing this delay seems to reduce crc errors, but results in reboot during failsafe test.
-			time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
+			time.Sleep(300 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
 			//println(uart.Buffered(), " bytes buffered")
 			continue
 		}
@@ -134,9 +134,11 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			//  if at all possible try to capture an entire packet here as well
 			if calculatedChecksum == b {
 				packetChan <- packet
-				//println("Received a valid CRSF packet with correct checksum.")
+				print(time.Now().UnixMilli())
+				println(" Received a valid CRSF packet.")
 			} else {
-				println("Checksum mismatch. Discarding packet.")
+				print(time.Now().UnixMilli())
+				println(time.Now().UnixMilli(), " Checksum mismatch. Discarding packet.")
 			}
 			resetState()
 		}

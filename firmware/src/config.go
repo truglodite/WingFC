@@ -12,7 +12,7 @@ const (
 	// elrs 50hz packet rate, wide switch mode = 12ch
 	// elrs 100hz packet rate, wide switch mode = 8ch
 	// elrs packet rates 150hz and higher show crc errors
-	NumChannels = 8
+	NumChannels = 12
 )
 
 // --- Receiver Configuration ---
