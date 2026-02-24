@@ -233,19 +233,19 @@ func main() {
 				// Switch to armed mode if CH5 is high
 				// Check for arm/disarm first every loop
 				if Channels[ArmChannel] <= HIGH_RX_VALUE {
-					println("Disarmed.")
+					//println("Disarmed.")
 					armed = false
 				} else {
-					println("Armed!")
+					//println("Armed!")
 					armed = true
 				}
 
 				// Check for manual mode every loop
 				if Channels[ManualModeChannel] <= HIGH_RX_VALUE {
-					println("Manual Mode")
+					//println("Manual Mode")
 					manualMode = true
 				} else {
-					println("Stab Mode")
+					//println("Stab Mode")
 					manualMode = false
 				}
 
@@ -323,8 +323,8 @@ func main() {
 				// Print status and sensor data for debugging
 				//println("    Pin       ,    Pout      ,    Rin       ,     Rout     , armed")
 				//println(desiredPitchRate, pitchOutput, desiredRollRate, rollOutput, armed)
-				println("RX: ele, ail, thr, mode, arm")
-				println("    ", Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
+				//println("RX: ele, ail, thr, mode, arm")
+				//println("    ", Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
 
 				//println("Left,Right,ESC")
 				//println(leftPulse, rightPulse, escPulse)
