@@ -321,12 +321,13 @@ func main() {
 				}
 				setESC(escPulse)
 				// Print status and sensor data for debugging
+				// Adding these statements can lead to the control loop crashing to failsafe if higher packet rates are used.
 				//println("    Pin       ,    Pout      ,    Rin       ,     Rout     , armed")
 				//println(desiredPitchRate, pitchOutput, desiredRollRate, rollOutput, armed)
 				//println("RX: ele, ail, thr, mode, arm")
 				//println("    ", Channels[ElevatorChannel], Channels[AileronChannel], Channels[ThrottleChannel], Channels[ManualModeChannel], Channels[ArmChannel])
 
-				//println("Left,Right,ESC")
+				//println("Left, Right, ESC")
 				//println(leftPulse, rightPulse, escPulse)
 				//println()
 
