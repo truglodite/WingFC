@@ -370,7 +370,8 @@ func main() {
 			case FAILSAFE:
 				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 				setESC(MIN_PULSE_WIDTH_US)
-				println("Receiver failsafe")
+				print(time.Now().UnixMilli())
+				println(" ---------------- Receiver failsafe")
 
 				if time.Since(LastPacketTime).Milliseconds() <= FAILSAFE_TIMEOUT_MS {
 					lastFlightState = flightState

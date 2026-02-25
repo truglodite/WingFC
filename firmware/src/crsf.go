@@ -134,8 +134,8 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			//  if at all possible try to capture an entire packet here as well
 			if calculatedChecksum == b {
 				packetChan <- packet
-				print(time.Now().UnixMilli())
-				println(" Received a valid CRSF packet.")
+				//print(time.Now().UnixMilli())
+				//println(" Received a valid CRSF packet.")
 			} else {
 				print(time.Now().UnixMilli())
 				println(" ------------------- Checksum mismatch. Discarding packet.")
