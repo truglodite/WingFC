@@ -22,6 +22,7 @@ const (
 	AileronChannel    = 0 // CH1
 	ElevatorChannel   = 1 // CH2
 	ThrottleChannel   = 2 // CH3
+	RudderChannel     = 3 // CH4
 	ArmChannel        = 4 // CH5
 	ManualModeChannel = 6 // CH7
 )
@@ -51,6 +52,9 @@ const (
 	// Maximum desired roll rate in degrees/sec
 	MAX_ROLL_RATE_DEG = 600
 
+	// Maximum desired yaw rate in degrees/sec
+	MAX_YAW_RATE_DEG = 100
+
 	// Weighting for combining gyro/accel with input
 	PID_WEIGHT = .7 //trug 0.5
 
@@ -62,4 +66,6 @@ const (
 	//rP, rI, rD = 1., 0.1, 0.01
 	pP, pI, pD = 2., 0.5, 0.01
 	rP, rI, rD = 2., 0.5, 0.01
+	// Yaw PID gains
+	yP, yI, yD = 1.5, 0.4, 0.01
 )

@@ -79,10 +79,9 @@ func mapRange[T constraints.Float](value, fromMin, fromMax, toMin, toMax T) T {
 	return (value-fromMin)/(fromMax-fromMin)*(toMax-toMin) + toMin
 }
 
-
 // setServo sets the PWM duty cycle for the aileron and elevator servos.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
-func setServo(leftPulse, rightPulse uint32) {
+func setServo(leftPulse, rightPulse, rudderPulse uint32) {
 	// The Period() function is not available. We use the saved period instead.
 	top_value := pwm0.Top()
 
@@ -93,6 +92,10 @@ func setServo(leftPulse, rightPulse uint32) {
 	// Calculate the duty cycle for the right servo.
 	duty_right := uint32(uint64(rightPulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
 	pwm0.Set(pwmCh2, duty_right)
+
+	// Calculate the duty cycle for the rudder servo.
+	duty_rudder := uint32(uint64(rudderPulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh4, duty_rudder)
 }
 
 // setESC sets the PWM duty cycle for the ESC.
@@ -103,5 +106,5 @@ func setESC(pulseWidth uint32) {
 
 	// Calculate the duty cycle for the ESC.
 	duty := uint32(uint64(pulseWidth) * 1000 * uint64(top_value) / uint64(escPeriodNs))
-	pwm1.Set(pwmCh3, duty)
+	pwm1.Set(escCh, duty)
 }

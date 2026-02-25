@@ -83,29 +83,82 @@ func (m *Matrix) Transpose() *Matrix {
 	return res
 }
 
-// Inverse returns the inverse of a 2x2 matrix.
+// Inverse returns the inverse of a square matrix using Gauss-Jordan elimination.
 func (m *Matrix) Inverse() *Matrix {
-	if m.rows != 2 || m.cols != 2 {
-		panic("Inverse is only implemented for 2x2 matrices")
+	if m.rows != m.cols {
+		panic("Inverse requires a square matrix")
+	}
+	n := m.rows
+
+	// Build augmented matrix [M | I]
+	aug := make([][]float64, n)
+	for i := 0; i < n; i++ {
+		aug[i] = make([]float64, 2*n)
+		for j := 0; j < n; j++ {
+			aug[i][j] = m.At(i, j)
+		}
+		for j := 0; j < n; j++ {
+			if i == j {
+				aug[i][n+j] = 1.0
+			} else {
+				aug[i][n+j] = 0.0
+			}
+		}
 	}
 
-	a := m.At(0, 0)
-	b := m.At(0, 1)
-	c := m.At(1, 0)
-	d := m.At(1, 1)
+	// Forward elimination / Gauss-Jordan with partial pivoting
+	for col := 0; col < n; col++ {
+		// Find pivot
+		pivot := col
+		maxAbs := abs(aug[col][col])
+		for r := col + 1; r < n; r++ {
+			if abs(aug[r][col]) > maxAbs {
+				maxAbs = abs(aug[r][col])
+				pivot = r
+			}
+		}
+		if maxAbs < 1e-12 {
+			panic("Matrix is singular or nearly singular and cannot be inverted")
+		}
+		// Swap rows if needed
+		if pivot != col {
+			aug[col], aug[pivot] = aug[pivot], aug[col]
+		}
 
-	det := a*d - b*c
-	if det == 0 {
-		panic("Matrix is singular and cannot be inverted")
+		// Normalize pivot row
+		pivVal := aug[col][col]
+		for j := 0; j < 2*n; j++ {
+			aug[col][j] /= pivVal
+		}
+
+		// Eliminate other rows
+		for r := 0; r < n; r++ {
+			if r == col {
+				continue
+			}
+			factor := aug[r][col]
+			if factor == 0 {
+				continue
+			}
+			for j := 0; j < 2*n; j++ {
+				aug[r][j] -= factor * aug[col][j]
+			}
+		}
 	}
 
-	invDet := 1.0 / det
-
-	res := NewMatrix(2, 2)
-	res.Set(0, 0, d*invDet)
-	res.Set(0, 1, -b*invDet)
-	res.Set(1, 0, -c*invDet)
-	res.Set(1, 1, a*invDet)
-
+	// Extract inverse from augmented matrix
+	res := NewMatrix(n, n)
+	for i := 0; i < n; i++ {
+		for j := 0; j < n; j++ {
+			res.Set(i, j, aug[i][n+j])
+		}
+	}
 	return res
+}
+
+func abs(x float64) float64 {
+	if x < 0 {
+		return -x
+	}
+	return x
 }
