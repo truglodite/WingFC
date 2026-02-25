@@ -101,6 +101,22 @@ func setServo(leftPulse, rightPulse, rudderPulse uint32) {
 // setESC sets the PWM duty cycle for the ESC.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
 func setESC(pulseWidth uint32) {
+	if USE_DSHOT {
+		// Map pulse width (microseconds) to DShot throttle range (0..2047)
+		var throttle uint16
+		if pulseWidth <= MIN_PULSE_WIDTH_US {
+			throttle = 0
+		} else {
+			val := uint16(mapRange(float64(pulseWidth), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
+			if val > 2047 {
+				val = 2047
+			}
+			throttle = val
+		}
+		SendDShot(throttle)
+		return
+	}
+
 	// The Period() function is not available. We use the saved period instead.
 	top_value := pwm1.Top()
 

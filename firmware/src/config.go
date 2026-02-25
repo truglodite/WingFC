@@ -37,6 +37,14 @@ const (
 	// another common ESC frequency is 400Hz
 	ESC_PWM_FREQUENCY = 50
 
+	// DShot configuration: enable DShot digital ESC protocol and choose rate.
+	// Set USE_DSHOT to true to use DShot instead of PWM for ESC outputs.
+	// Default is false to use legacy PWM.
+	USE_DSHOT = false
+
+	// Supported values: 150, 300, 600, 1200 (kHz). Lower values are easier to bit-bang.
+	DSHOT_RATE = 300
+
 	// Deadband around neutral for stick input
 	DEADBAND = 10
 

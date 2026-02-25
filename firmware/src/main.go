@@ -27,6 +27,7 @@ var (
 	pwmCh2        uint8
 	pwmCh4        uint8
 	escCh         uint8
+	escPin        machine.Pin
 	servoPeriodNs uint64
 	escPeriodNs   uint64
 
@@ -139,21 +140,28 @@ func main() {
 	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
 
-	escPWMConfig := machine.PWMConfig{
-		Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,
+	if USE_DSHOT {
+		escPin = PWM_CH3_PIN
+		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+		setESC(MIN_PULSE_WIDTH_US)
+		println("DShot configured for ESC.")
+	} else {
+		escPWMConfig := machine.PWMConfig{
+			Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,
+		}
+		if err = pwm1.Configure(escPWMConfig); err != nil {
+			println("could not configure PWM for ESC:", err)
+			return
+		}
+		escPeriodNs = escPWMConfig.Period
+		escCh, err = pwm1.Channel(PWM_CH3_PIN)
+		if err != nil {
+			println("could not get PWM channel for ESC:", err)
+			return
+		}
+		setESC(MIN_PULSE_WIDTH_US)
+		println("PWM configured for ESC.")
 	}
-	if err = pwm1.Configure(escPWMConfig); err != nil {
-		println("could not configure PWM for ESC:", err)
-		return
-	}
-	escPeriodNs = escPWMConfig.Period
-	escCh, err = pwm1.Channel(PWM_CH3_PIN)
-	if err != nil {
-		println("could not get PWM channel for ESC:", err)
-		return
-	}
-	setESC(MIN_PULSE_WIDTH_US)
-	println("PWM configured for ESC.")
 
 	i2c.Configure(machine.I2CConfig{
 		Frequency: 400 * machine.KHz,
