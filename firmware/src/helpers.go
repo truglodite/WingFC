@@ -81,33 +81,37 @@ func mapRange[T constraints.Float](value, fromMin, fromMax, toMin, toMax T) T {
 
 // setServo sets the PWM duty cycle for the aileron and elevator servos.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
-func setServo(leftPulse, rightPulse, rudderPulse uint32) {
+func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse uint32) {
 	// The Period() function is not available. We use the saved period instead.
 	top_value := pwm0.Top()
 
 	// Calculate the duty cycle for the left servo.
-	duty_left := uint32(uint64(leftPulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
-	pwm0.Set(pwmCh1, duty_left)
+	servo1 := uint32(uint64(servo1pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh1, servo1)
 
 	// Calculate the duty cycle for the right servo.
-	duty_right := uint32(uint64(rightPulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
-	pwm0.Set(pwmCh2, duty_right)
+	servo2 := uint32(uint64(servo2Pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh2, servo2)
 
 	// Calculate the duty cycle for the rudder servo.
-	duty_rudder := uint32(uint64(rudderPulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
-	pwm0.Set(pwmCh4, duty_rudder)
+	servo4 := uint32(uint64(servo4Pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh4, servo4)
+
+	// Calculate the duty cycle for the fifth servo.
+	servo5 := uint32(uint64(servo5pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh5, servo5)
 }
 
 // setESC sets the PWM duty cycle for the ESC.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
-func setESC(pulseWidth uint32) {
+func setESC(servo3pulse uint32) {
 	if USE_DSHOT {
 		// Map pulse width (microseconds) to DShot throttle range (0..2047)
 		var throttle uint16
-		if pulseWidth <= MIN_PULSE_WIDTH_US {
+		if servo3pulse <= MIN_PULSE_WIDTH_US {
 			throttle = 0
 		} else {
-			val := uint16(mapRange(float64(pulseWidth), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
+			val := uint16(mapRange(float64(servo3pulse), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
 			if val > 2047 {
 				val = 2047
 			}

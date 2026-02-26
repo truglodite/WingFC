@@ -26,6 +26,7 @@ var (
 	pwmCh1        uint8
 	pwmCh2        uint8
 	pwmCh4        uint8
+	pwmCh5        uint8
 	escCh         uint8
 	escPin        machine.Pin
 	servoPeriodNs uint64
@@ -44,9 +45,8 @@ var (
 	accelXSum, accelYSum, accelZSum, accelBiasX, accelBiasY, accelBiasZ float64 = 0., 0., 0., 0., 0., 0.
 	gyroXSum, gyroYSum, gyroZSum, gyroBiasX, gyroBiasY, gyroBiasZ       float64 = 0., 0., 0., 0., 0., 0.
 	xA, yA, zA, xG, yG, zG                                              int32
-	desiredPitchRate, desiredRollRate                                   float64
-	pitchOutput, rollOutput                                             float64
-	desiredYawRate, yawOutput                                           float64
+	desiredPitchRate, desiredRollRate, desiredYawRate                   float64
+	pitchOutput, rollOutput, yawOutput                                  float64
 	escPulse                                                            uint32
 
 	// RC Channels
@@ -79,10 +79,11 @@ const (
 	MAX_YAW_RATE   = MAX_YAW_RATE_DEG * math.Pi / 180
 
 	// --- Hardware Mappings ---
-	PWM_CH1_PIN = machine.D0 // Aileron Servo
-	PWM_CH2_PIN = machine.D1 // Elevator Servo
-	PWM_CH3_PIN = machine.D2 // ESC (Electronic Speed Controller)
-	PWM_CH4_PIN = machine.D3 // Yaw Servo (Rudder)
+	PWM_CH1_PIN = machine.D0 // Servo 1
+	PWM_CH2_PIN = machine.D1 // Servo 2
+	PWM_CH3_PIN = machine.D2 // Servo 3
+	PWM_CH4_PIN = machine.D3 // Servo 4
+	PWM_CH5_PIN = machine.D4 // Servo 5
 
 	// Fail-safe constants
 	// for CSRF, we need to wait at least 1second
@@ -137,7 +138,12 @@ func main() {
 		println("could not get PWM channel 4:", err)
 		return
 	}
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	pwmCh5, err = pwm0.Channel(PWM_CH5_PIN)
+	if err != nil {
+		println("could not get PWM channel 5:", err)
+		return
+	}
+	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
 
 	if USE_DSHOT {
@@ -200,7 +206,7 @@ func main() {
 	println("Initial calibration")
 	println("Calibrating Gyro... Keep gyro still!")
 	// Keep outputs at neutral and ESC at zero
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	setESC(MIN_PULSE_WIDTH_US)
 	calibrate()
 
@@ -285,9 +291,10 @@ func main() {
 
 				// Trug: In case near crash disarm we may still want directional control.
 				// In armed mode, use RC inputs to set desired rates.
-				// Get desired roll and pitch rates from the RC receiver.
+				// Get desired pitch, roll, and yaw rates from the RC receiver.
 				desiredPitchRate = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
 				desiredRollRate = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
+				desiredYawRate = mapRange(float64(Channels[RudderChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_YAW_RATE, MAX_YAW_RATE)
 
 				// Apply deadband to avoid small unwanted movements
 				if math.Abs(desiredPitchRate) < DEADBAND*math.Pi/180 {
@@ -296,9 +303,6 @@ func main() {
 				if math.Abs(desiredRollRate) < DEADBAND*math.Pi/180 {
 					desiredRollRate = 0
 				}
-
-				// Desired yaw rate from rudder channel
-				desiredYawRate = mapRange(float64(Channels[RudderChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_YAW_RATE, MAX_YAW_RATE)
 				if math.Abs(desiredYawRate) < DEADBAND*math.Pi/180 {
 					desiredYawRate = 0
 				}
@@ -323,24 +327,54 @@ func main() {
 					yawOutput = desiredYawRate
 				}
 
-				// Combine PID outputs with a mix of raw RC input.
-				leftElevon := pitchOutput + rollOutput
-				rightElevon := pitchOutput - rollOutput
+				// Mix control outputs dependent on aircraft type configuration
+				var servo1, servo2, servo4, servo5 float64
+				if TYPE_1 {
+					// Single aileron T tail
+					servo1 = rollOutput
+					servo2 = pitchOutput
+					servo4 = yawOutput
+					servo5 = 0
+				} else if TYPE_2 {
+					// Dual aileron T tail
+					servo1 = rollOutput
+					servo2 = pitchOutput
+					servo4 = yawOutput
+					servo5 = -rollOutput
+				} else if TYPE_3 {
+					// Single aileron V tail
+					servo1 = rollOutput
+					servo2 = pitchOutput + yawOutput
+					servo4 = pitchOutput - yawOutput
+					servo5 = 0
+				} else if TYPE_4 {
+					// Dual aileron V tail
+					servo1 = rollOutput
+					servo2 = pitchOutput + yawOutput
+					servo4 = pitchOutput - yawOutput
+					servo5 = -rollOutput
+				} else if TYPE_5 {
+					// Elevon delta
+					servo1 = pitchOutput + rollOutput
+					servo2 = pitchOutput - rollOutput
+					servo4 = yawOutput
+					servo5 = 0
+				}
 
 				// Convert control outputs to PWM pulse widths.
-				leftElevon = mapRange(float64(leftElevon), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-				rightElevon = mapRange(float64(rightElevon), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-
-				// Rudder (yaw) pulse
-				rudder := mapRange(float64(yawOutput), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 
 				// Constrain pulse widths to a valid range.
-				leftPulse := uint32(constrain(leftElevon, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				rightPulse := uint32(constrain(rightElevon, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				rudderPulse := uint32(constrain(rudder, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo1pulse := uint32(constrain(servo1, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo2pulse := uint32(constrain(servo2, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo4pulse := uint32(constrain(servo4, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo5pulse := uint32(constrain(servo5, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 
-				// Set the PWM signals for the servos (left, right, rudder).
-				setServo(leftPulse, rightPulse, rudderPulse)
+				// Set the PWM signals for the servos
+				setServo(servo1pulse, servo2pulse, servo4pulse, servo5pulse)
 
 				// Arming engages throttle control Disarming disengages throttle control
 				// Stabilization takes place regardless
@@ -368,7 +402,7 @@ func main() {
 				//println()
 
 			case FAILSAFE:
-				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 				setESC(MIN_PULSE_WIDTH_US)
 				print(time.Now().UnixMilli())
 				println(" ---------------- Receiver failsafe")

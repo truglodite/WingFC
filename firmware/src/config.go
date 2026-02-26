@@ -27,6 +27,16 @@ const (
 	ManualModeChannel = 6 // CH7
 )
 
+// --- Aircraft Type Configuration ---
+const (
+	// Set only one to true
+	TYPE_1 = false // Single aileron T tail configuration
+	TYPE_2 = false // Dual aileron T tail configuration
+	TYPE_3 = false // Single aileron V tail configuration
+	TYPE_4 = false // Dual aileron V tail configuration
+	TYPE_5 = true  // Elevon delta configuration
+)
+
 // --- PWM Configuration ---
 const (
 	// Analog servo frequency 50Hz
