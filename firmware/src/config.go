@@ -8,15 +8,14 @@ package main
 
 // --- Protocol Settings ---
 const (
-	// Number of supported RC channels
-	// elrs 50hz packet rate, wide switch mode = 12ch
-	// elrs 100hz packet rate, wide switch mode = 8ch
-	// elrs packet rates 150hz and higher show crc errors
+	// Number of supported RC channels (default 12)
+	// elrs 50hz, 150hz, 250hz, 500hz packet rates w/ wide switch mode = 12ch
+	// elrs 100hz/full, 333hz/full packet rates = 8ch or 16ch
+
 	NumChannels = 12
 )
 
-// --- Receiver Configuration ---
-// --- Channel Mappings ---
+// --- Receiver Channel Mapping ----
 
 const (
 	AileronChannel    = 0 // CH1
@@ -27,9 +26,9 @@ const (
 	ManualModeChannel = 6 // CH7
 )
 
-// --- Aircraft Type Configuration ---
+// --- Aircraft Type ---
 const (
-	// Set only one to true
+	// Set only one to true (default TYPE_5 = true)
 	TYPE_1 = false // Single aileron T tail configuration
 	TYPE_2 = false // Dual aileron T tail configuration
 	TYPE_3 = false // Single aileron V tail configuration
@@ -37,50 +36,50 @@ const (
 	TYPE_5 = true  // Elevon delta configuration
 )
 
-// --- PWM Configuration ---
+// --- Hardware Output Configuration ---
 const (
-	// Analog servo frequency 50Hz
-	// Digital servo frequency 100Hz 250Hz 333Hz etc.
+	// Servo output frequency (default 50Hz)
+	// Analog servos use 50Hz, digital servos may use 100Hz 250Hz 333Hz etc.
 	SERVO_PWM_FREQUENCY = 50
 
-	// ESC frequency set at analog servo frequency 50Hz
-	// another common ESC frequency is 400Hz
+	// ESC Frequency (default 50)
+	// Common analog esc's use 50Hz. Another common ESC frequency is 400Hz
 	ESC_PWM_FREQUENCY = 50
 
-	// DShot configuration: enable DShot digital ESC protocol and choose rate.
-	// Set USE_DSHOT to true to use DShot instead of PWM for ESC outputs.
-	// Default is false to use legacy PWM.
+	// DShot ESC Configuration (default false)
+	// Set USE_DSHOT = true to enable DShot output, false to enable PWM output
 	USE_DSHOT = false
 
-	// Supported values: 150, 300, 600, 1200 (kHz). Lower values are easier to bit-bang.
+	// DSHOT rate: 150, 300, 600, 1200 (kHz). (default 300)
+	// Please use <= 300... lower values are easier to bit-bang.
 	DSHOT_RATE = 300
 
-	// Deadband around neutral for stick input
+	// Microseconds of deadband around neutral to use for control stick inputs (default 10)
 	DEADBAND = 10
 
-	// High Rx channel value for arming/calibration
+	// RX output microseconds above which binary logic evaluates as true (arming and flight mode, default 1980)
 	HIGH_RX_VALUE = 1980
 )
 
 // --- Flight Control Parameters ---
 const (
-	// Maximum desired pitch rate in degrees/sec
-	MAX_PITCH_RATE_DEG = 600 //trug 200
+	// Maximum desired pitch rate in degrees/sec (default 200)
+	MAX_PITCH_RATE_DEG = 600
 
-	// Maximum desired roll rate in degrees/sec
+	// Maximum desired roll rate in degrees/sec (default 600)
 	MAX_ROLL_RATE_DEG = 600
 
-	// Maximum desired yaw rate in degrees/sec
+	// Maximum desired yaw rate in degrees/sec (default 100)
 	MAX_YAW_RATE_DEG = 100
 
-	// Weighting for combining gyro/accel with input
-	PID_WEIGHT = .7 //trug 0.5
+	// Weighting for combining gyro/accel with input (default 0.5)
+	PID_WEIGHT = .7
 
-	// LPF alpha for gyro/accel fusion
+	// LPF alpha for gyro/accel fusion (default 0.2)
 	LPF_ALPHA = 0.2
 
 	// PID gains (P, I, D) for the roll, pitch, and yaw controllers
-	pP, pI, pD = 2., 0.5, 0.01
-	rP, rI, rD = 2., 0.5, 0.01
-	yP, yI, yD = 1.0, 0.4, 0.01
+	pP, pI, pD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
+	rP, rI, rD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
+	yP, yI, yD = 1.0, 0.4, 0.01 // default 1., 0.4, 0.01
 )
