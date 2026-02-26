@@ -320,10 +320,10 @@ func main() {
 					yawOutput = yawPID.Update(yawError, dt) * PID_WEIGHT
 				} else { // use rc inputs if in manual mode
 					pitchPID.integral = 0 // reset integral term in manual mode to prevent windup
-					rollPID.integral = 0  // reset integral term in manual mode to prevent windup
+					rollPID.integral = 0
+					yawPID.integral = 0
 					pitchOutput = desiredPitchRate
 					rollOutput = desiredRollRate
-					yawPID.integral = 0
 					yawOutput = desiredYawRate
 				}
 
@@ -340,7 +340,7 @@ func main() {
 					servo1 = rollOutput
 					servo2 = pitchOutput
 					servo4 = yawOutput
-					servo5 = -rollOutput
+					servo5 = rollOutput
 				} else if TYPE_3 {
 					// Single aileron V tail
 					servo1 = rollOutput
@@ -352,11 +352,11 @@ func main() {
 					servo1 = rollOutput
 					servo2 = pitchOutput + yawOutput
 					servo4 = pitchOutput - yawOutput
-					servo5 = -rollOutput
+					servo5 = rollOutput
 				} else if TYPE_5 {
 					// Elevon delta
-					servo1 = pitchOutput + rollOutput
-					servo2 = pitchOutput - rollOutput
+					servo1 = rollOutput + pitchOutput
+					servo2 = rollOutput - pitchOutput
 					servo4 = yawOutput
 					servo5 = 0
 				}

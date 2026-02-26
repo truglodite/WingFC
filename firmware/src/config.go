@@ -79,11 +79,8 @@ const (
 	// LPF alpha for gyro/accel fusion
 	LPF_ALPHA = 0.2
 
-	// PID gains (P, I, D) for the pitch and roll controllers
-	//pP, pI, pD = 1., 0.1, 0.01  //trug defaults
-	//rP, rI, rD = 1., 0.1, 0.01
+	// PID gains (P, I, D) for the roll, pitch, and yaw controllers
 	pP, pI, pD = 2., 0.5, 0.01
 	rP, rI, rD = 2., 0.5, 0.01
-	// Yaw PID gains
-	yP, yI, yD = 1.5, 0.4, 0.01
+	yP, yI, yD = 1.0, 0.4, 0.01
 )
