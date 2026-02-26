@@ -125,6 +125,6 @@ func setESC(servo3pulse uint32) {
 	top_value := pwm1.Top()
 
 	// Calculate the duty cycle for the ESC.
-	duty := uint32(uint64(pulseWidth) * 1000 * uint64(top_value) / uint64(escPeriodNs))
+	duty := uint32(uint64(servo3pulse) * 1000 * uint64(top_value) / uint64(escPeriodNs))
 	pwm1.Set(escCh, duty)
 }
