@@ -26,15 +26,14 @@ const (
 )
 
 // --- Board Orientation ---
-// default defined as chip on top, usb to the left.?
-// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
-// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
 const (
+	// default defined as chip on top, usb to the left.?
+	// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
+	// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
 	orientation = 0
 )
 
 // --- Receiver Channel Mapping ----
-
 const (
 	AileronChannel    = 0 // CH1
 	ElevatorChannel   = 1 // CH2
@@ -42,6 +41,16 @@ const (
 	RudderChannel     = 3 // CH4
 	ArmChannel        = 4 // CH5
 	ManualModeChannel = 6 // CH7
+)
+
+// --- Servo reverse ---
+const (
+	// Set each to true if the servo should be reversed
+	servo1reverse = false
+	servo2reverse = false
+	servo4reverse = false
+	servo5reverse = false
+	servo6reverse = false
 )
 
 // --- Hardware Output Configuration ---

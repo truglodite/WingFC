@@ -28,9 +28,7 @@ func readLSMData() {
 	} else if imuOrientation == 3 { // CW270
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, rawGyroZ
-	} else
-	// need to flesh out the rest of these orientations
-	if imuOrientation == 4 { // flip
+	} else if imuOrientation == 4 { // flip
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, rawAccelY, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, rawGyroY, -rawGyroZ
 	} else if imuOrientation == 5 { // flipCW90

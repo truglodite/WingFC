@@ -364,10 +364,25 @@ func main() {
 				}
 
 				// Convert control outputs to PWM pulse widths.
+				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MAX_PULSE_WIDTH_US, MIN_PULSE_WIDTH_US)
 				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+
+				// Reverse servos as required
+				if servo1reverse {
+					servo1 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo1
+				}
+				if servo2reverse {
+					servo2 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo2
+				}
+				if servo4reverse {
+					servo4 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo4
+				}
+				if servo5reverse {
+					servo5 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo5
+				}
 
 				// Constrain pulse widths to a valid range.
 				servo1pulse := uint32(constrain(servo1, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
