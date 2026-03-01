@@ -2,7 +2,7 @@ package main
 
 import "golang.org/x/exp/constraints"
 
-// Read raw IMU data from the LSM6DS3TR sensor and apply a low-pass filter.
+// Read raw IMU data from the LSM6DS3TR sensor, remap for board orientation, and apply a low-pass filter.
 func readLSMData() {
 	var rawAccelXo, rawAccelYo, rawAccelZo, rawGyroXo, rawGyroYo, rawGyroZo int32
 
@@ -16,79 +16,40 @@ func readLSMData() {
 	}
 
 	// Map imu data based on board orientation configuration
-	if imuOrientation == 0 {	// default
-		rawAccelXo = rawAccelX
-		rawAccelYo = rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroX
-		rawGyroYo = rawGyroY
-		rawGyroZo = rawGyroZ
-	}
-	else if imuOrientation == 1 {	// CW90
-		rawAccelXo = rawAccelY
-		rawAccelYo = -rawAccelX
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroY
-		rawGyroYo = -rawGyroX
-		rawGyroZo = rawGyroZ
-	}
-	else if imuOrientation == 2 {	// CW180
-		rawAccelXo = -rawAccelX
-		rawAccelYo = -rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = -rawGyroX
-		rawGyroYo = -rawGyroY
-		rawGyroZo = rawGyroZ
-	} 
-	else if imuOrientation == 3 {	// CW270
-		rawAccelXo = -rawAccelY
-		rawAccelYo = rawAccelX
-		rawAccelZo = rawAccelZ
-		rawGyroXo = -rawGyroY
-		rawGyroYo = rawGyroX
-		rawGyroZo = rawGyroZ
-	} 
+	if imuOrientation == 0 { // default
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
+	} else if imuOrientation == 1 { // CW90
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, rawGyroZ
+	} else if imuOrientation == 2 { // CW180
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, -rawAccelY, rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, -rawGyroY, rawGyroZ
+	} else if imuOrientation == 3 { // CW270
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, rawGyroZ
+	} else
 	// need to flesh out the rest of these orientations
-	else if imuOrientation == 4 {	// flip
-				rawAccelXo = rawAccelX
-		rawAccelYo = rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroX
-		rawGyroYo = rawGyroY
-		rawGyroZo = rawGyroZ
-	} 
-	else if imuOrientation == 5 {	// flipCW90
-				rawAccelXo = rawAccelX
-		rawAccelYo = rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroX
-		rawGyroYo = rawGyroY
-		rawGyroZo = rawGyroZ
-	} 
-	else if imuOrientation == 6 {	// flipCW180
-				rawAccelXo = rawAccelX
-		rawAccelYo = rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroX
-		rawGyroYo = rawGyroY
-		rawGyroZo = rawGyroZ
-	} 
-	else if imuOrientation == 7 {	// flipCW270
-				rawAccelXo = rawAccelX
-		rawAccelYo = rawAccelY
-		rawAccelZo = rawAccelZ
-		rawGyroXo = rawGyroX
-		rawGyroYo = rawGyroY
-		rawGyroZo = rawGyroZ
+	if imuOrientation == 4 { // flip
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, rawAccelY, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, rawGyroY, -rawGyroZ
+	} else if imuOrientation == 5 { // flipCW90
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, -rawGyroZ
+	} else if imuOrientation == 6 { // flipCW180
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, -rawAccelY, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, -rawGyroY, -rawGyroZ
+	} else if imuOrientation == 7 { // flipCW270
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, -rawGyroZ
 	} else {
 		// Go requires these to be initialized.
-		// If imuOrientation isn't 0, we'll just pass raw data through for now.
+		// If imuOrientation isn't 0-7, use default.
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
 	}
 
-	// 3. Apply Filter using the 'o' variables
-	// This fixes the "declared and not used" error and applies your orientation logic.
+	// Apply filtering to remapped IMU data
 	imuData.AccelX += LPF_ALPHA * (float64(rawAccelXo)*microGToMS2 - imuData.AccelX)
 	imuData.AccelY += LPF_ALPHA * (float64(rawAccelYo)*microGToMS2 - imuData.AccelY)
 	imuData.AccelZ += LPF_ALPHA * (float64(rawAccelZo)*microGToMS2 - imuData.AccelZ)
