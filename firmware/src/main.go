@@ -33,13 +33,14 @@ var (
 	escPeriodNs   uint64
 
 	// Control system components
-	pitchPID   *PIDController
-	rollPID    *PIDController
-	yawPID     *PIDController
-	dt         = 0.01
-	kf         *KalmanFilter
-	imuData    IMU
-	imuYawMeas float64
+	pitchPID       *PIDController
+	rollPID        *PIDController
+	yawPID         *PIDController
+	dt             = 0.01
+	kf             *KalmanFilter
+	imuData        IMU
+	imuYawMeas     float64
+	imuOrientation = orientation
 
 	// IMU calibration
 	accelXSum, accelYSum, accelZSum, accelBiasX, accelBiasY, accelBiasZ float64 = 0., 0., 0., 0., 0., 0.
@@ -143,6 +144,7 @@ func main() {
 		println("could not get PWM channel 5:", err)
 		return
 	}
+	// set servos 1, 2, 4, 5 (not yet 6) to subtrim values
 	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
 

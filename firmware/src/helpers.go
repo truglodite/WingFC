@@ -4,7 +4,8 @@ import "golang.org/x/exp/constraints"
 
 // Read raw IMU data from the LSM6DS3TR sensor and apply a low-pass filter.
 func readLSMData() {
-	// Read raw sensor data from the IMU
+	var rawAccelXo, rawAccelYo, rawAccelZo, rawGyroXo, rawGyroYo, rawGyroZo int32
+
 	rawAccelX, rawAccelY, rawAccelZ, err := lsm.ReadAcceleration()
 	if err != nil {
 		println("Error reading acceleration:", err)
@@ -14,13 +15,87 @@ func readLSMData() {
 		println("Error reading rotation:", err)
 	}
 
-	// Low-pass filter
-	imuData.AccelX += LPF_ALPHA * (float64(rawAccelX)*microGToMS2 - imuData.AccelX)
-	imuData.AccelY += LPF_ALPHA * (float64(rawAccelY)*microGToMS2 - imuData.AccelY)
-	imuData.AccelZ += LPF_ALPHA * (float64(rawAccelZ)*microGToMS2 - imuData.AccelZ)
-	imuData.GyroX += LPF_ALPHA * (float64(rawGyroX)*microDPSToRadS - imuData.GyroX)
-	imuData.GyroY += LPF_ALPHA * (float64(rawGyroY)*microDPSToRadS - imuData.GyroY)
-	imuData.GyroZ += LPF_ALPHA * (float64(rawGyroZ)*microDPSToRadS - imuData.GyroZ)
+	// Map imu data based on board orientation configuration
+	if imuOrientation == 0 {	// default
+		rawAccelXo = rawAccelX
+		rawAccelYo = rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroX
+		rawGyroYo = rawGyroY
+		rawGyroZo = rawGyroZ
+	}
+	else if imuOrientation == 1 {	// CW90
+		rawAccelXo = rawAccelY
+		rawAccelYo = -rawAccelX
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroY
+		rawGyroYo = -rawGyroX
+		rawGyroZo = rawGyroZ
+	}
+	else if imuOrientation == 2 {	// CW180
+		rawAccelXo = -rawAccelX
+		rawAccelYo = -rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = -rawGyroX
+		rawGyroYo = -rawGyroY
+		rawGyroZo = rawGyroZ
+	} 
+	else if imuOrientation == 3 {	// CW270
+		rawAccelXo = -rawAccelY
+		rawAccelYo = rawAccelX
+		rawAccelZo = rawAccelZ
+		rawGyroXo = -rawGyroY
+		rawGyroYo = rawGyroX
+		rawGyroZo = rawGyroZ
+	} 
+	// need to flesh out the rest of these orientations
+	else if imuOrientation == 4 {	// flip
+				rawAccelXo = rawAccelX
+		rawAccelYo = rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroX
+		rawGyroYo = rawGyroY
+		rawGyroZo = rawGyroZ
+	} 
+	else if imuOrientation == 5 {	// flipCW90
+				rawAccelXo = rawAccelX
+		rawAccelYo = rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroX
+		rawGyroYo = rawGyroY
+		rawGyroZo = rawGyroZ
+	} 
+	else if imuOrientation == 6 {	// flipCW180
+				rawAccelXo = rawAccelX
+		rawAccelYo = rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroX
+		rawGyroYo = rawGyroY
+		rawGyroZo = rawGyroZ
+	} 
+	else if imuOrientation == 7 {	// flipCW270
+				rawAccelXo = rawAccelX
+		rawAccelYo = rawAccelY
+		rawAccelZo = rawAccelZ
+		rawGyroXo = rawGyroX
+		rawGyroYo = rawGyroY
+		rawGyroZo = rawGyroZ
+	} else {
+		// Go requires these to be initialized.
+		// If imuOrientation isn't 0, we'll just pass raw data through for now.
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
+	}
+
+	// 3. Apply Filter using the 'o' variables
+	// This fixes the "declared and not used" error and applies your orientation logic.
+	imuData.AccelX += LPF_ALPHA * (float64(rawAccelXo)*microGToMS2 - imuData.AccelX)
+	imuData.AccelY += LPF_ALPHA * (float64(rawAccelYo)*microGToMS2 - imuData.AccelY)
+	imuData.AccelZ += LPF_ALPHA * (float64(rawAccelZo)*microGToMS2 - imuData.AccelZ)
+
+	imuData.GyroX += LPF_ALPHA * (float64(rawGyroXo)*microDPSToRadS - imuData.GyroX)
+	imuData.GyroY += LPF_ALPHA * (float64(rawGyroYo)*microDPSToRadS - imuData.GyroY)
+	imuData.GyroZ += LPF_ALPHA * (float64(rawGyroZo)*microDPSToRadS - imuData.GyroZ)
 }
 
 // Process the raw IMU data by applying calibration offsets and computing roll/pitch angles.

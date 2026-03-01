@@ -15,6 +15,24 @@ const (
 	NumChannels = 12
 )
 
+// --- Aircraft Type ---
+const (
+	// Set only one to true (default TYPE_5 = true)
+	TYPE_1 = false // Single aileron T tail configuration
+	TYPE_2 = false // Dual aileron T tail configuration
+	TYPE_3 = false // Single aileron V tail configuration
+	TYPE_4 = false // Dual aileron V tail configuration
+	TYPE_5 = true  // Elevon delta configuration
+)
+
+// --- Board Orientation ---
+// default defined as chip on top, usb to the left.?
+// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
+// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
+const (
+	orientation = 0
+)
+
 // --- Receiver Channel Mapping ----
 
 const (
@@ -24,16 +42,6 @@ const (
 	RudderChannel     = 3 // CH4
 	ArmChannel        = 4 // CH5
 	ManualModeChannel = 6 // CH7
-)
-
-// --- Aircraft Type ---
-const (
-	// Set only one to true (default TYPE_5 = true)
-	TYPE_1 = false // Single aileron T tail configuration
-	TYPE_2 = false // Dual aileron T tail configuration
-	TYPE_3 = false // Single aileron V tail configuration
-	TYPE_4 = false // Dual aileron V tail configuration
-	TYPE_5 = true  // Elevon delta configuration
 )
 
 // --- Hardware Output Configuration ---
