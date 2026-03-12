@@ -1,11 +1,4 @@
-//go:build crsf
-// +build crsf
-
-package main
-
-import (
-	"time"
-)
+package crsf
 
 // CRSF (Crossfire) protocol receiver implementation
 // Used by TBS Crossfire and ExpressLRS for RC link
@@ -65,12 +58,6 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 
 	for {
 
-		if uart.Buffered() <= CRSF_PACKET_SIZE {
-			// wait for full packet in buffer
-			time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer
-			continue
-		}
-
 		b, err := uart.ReadByte()
 		if err != nil {
 			// A non-blocking read returns a timeout error. We can simply continue.
@@ -124,8 +111,6 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 			// The CRC8 is calculated over the frame, from after the length
 			// byte at index 2 to the end of the payload at packetIndex.
 			calculatedChecksum := calculateCrc8(packet[2:packetIndex])
-			// breakpoint here to check variables. specifically checksum and index and
-			//  if at all possible try to capture an entire packet here as well
 			if calculatedChecksum == b {
 				packetChan <- packet
 			} else {
@@ -146,7 +131,7 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 
 	var channelValues [NumChannels]uint16
 	var bitsMerged uint
-	var readValue int32
+	var readValue uint32
 	var readByteIndex uint
 
 	for n := 0; n < NumChannels; n++ {
@@ -157,15 +142,10 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 			}
 			readByte := bitstream[readByteIndex]
 			readByteIndex++
-			readValue |= int32(readByte) << bitsMerged
+			readValue |= uint32(readByte) << bitsMerged
 			bitsMerged += 8
 		}
-
 		channelValues[n] = uint16(readValue & 0x07FF)
-
-		// Based on CRSF spec, https://github.com/tbs-fpv/tbs-crsf-spec/blob/main/crsf.md#0x16-rc-channels-packed-payload
-		//usec = 1500 + (ticks-992)*5/8
-		channelValues[n] = 880 + (channelValues[n])*5/8 // probably not ideal
 		readValue >>= 11
 		bitsMerged -= 11
 	}
