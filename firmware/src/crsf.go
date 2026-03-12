@@ -97,7 +97,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 
 // processReceiverPacket unpacks the 11-bit channel values from a CRSF packet payload.
 // This function is based on the robust bit-packing logic from BetaFlight.
-func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) [NumChannels]uint16 {
+func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) {
 	// The RC channel data starts at byte 3 of the packet
 	const payloadStartIndex = 3
 	// The payload is from index 3 to the checksum byte's index (25) - 1
@@ -105,25 +105,30 @@ func processReceiverPacket(payload [CRSF_PACKET_SIZE]byte) [NumChannels]uint16 {
 
 	var channelValues [NumChannels]uint16
 	var bitsMerged uint
-	var readValue uint32
+	var readValue int32
 	var readByteIndex uint
 
 	for n := 0; n < NumChannels; n++ {
 		for bitsMerged < 11 {
 			// Add a boundary check to prevent out of range access
 			if readByteIndex >= uint(len(bitstream)) {
-				return channelValues
+				Channels = channelValues
 			}
 			readByte := bitstream[readByteIndex]
 			readByteIndex++
-			readValue |= uint32(readByte) << bitsMerged
+			readValue |= int32(readByte) << bitsMerged
 			bitsMerged += 8
 		}
+
 		channelValues[n] = uint16(readValue & 0x07FF)
+
+		// Based on CRSF spec, https://github.com/tbs-fpv/tbs-crsf-spec/blob/main/crsf.md#0x16-rc-channels-packed-payload
+		//usec = 1500 + (ticks-992)*5/8
+		channelValues[n] = 880 + (channelValues[n])*5/8 // probably not ideal
 		readValue >>= 11
 		bitsMerged -= 11
 	}
-	return channelValues
+	Channels = channelValues
 }
 
 // calculateCrc8 computes the CRC8 checksum for a CRSF packet.
