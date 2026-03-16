@@ -217,17 +217,7 @@ servoCh5Init:
 escInit:
 	if USE_DSHOT {
 		escPin = PWM_CH3_PIN
-		if err = escPin.Configure(machine.PinConfig{Mode: machine.PinOutput}); err != nil {
-			setLED(7) // RGB on esc init error
-			retries++
-			if retries < 5 {
-				time.Sleep(100 * time.Millisecond)
-				goto escInit
-			}
-			// Fallback or panic if max retries exceeded
-			println("CRITICAL: DSHOT ESC Init Failed")
-			return
-		}
+		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
 		setESC(MIN_PULSE_WIDTH_US)
 		println("DShot configured for ESC.")
 	} else {
