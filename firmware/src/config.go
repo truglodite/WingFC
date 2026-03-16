@@ -27,7 +27,7 @@ const (
 
 // --- Board Orientation ---
 const (
-	// default defined as chip on top, usb to the left.?
+	// default defined as chip on top, usb to the rear.
 	// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
 	// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
 	orientation = 0

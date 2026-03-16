@@ -16,33 +16,29 @@ func readLSMData() {
 	}
 
 	// Map imu data based on board orientation configuration
-	if imuOrientation == 0 { // default
-		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
-		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
-	} else if imuOrientation == 1 { // CW90
+	switch imuOrientation {
+	case 1: // CW90
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, rawGyroZ
-	} else if imuOrientation == 2 { // CW180
+	case 2: // CW180
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, -rawAccelY, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, -rawGyroY, rawGyroZ
-	} else if imuOrientation == 3 { // CW270
+	case 3: // CW270
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, rawGyroZ
-	} else if imuOrientation == 4 { // flip
+	case 4: // flip
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, rawAccelY, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, rawGyroY, -rawGyroZ
-	} else if imuOrientation == 5 { // flipCW90
+	case 5: // flipCW90
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, -rawGyroZ
-	} else if imuOrientation == 6 { // flipCW180
+	case 6: // flipCW180
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, -rawAccelY, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, -rawGyroY, -rawGyroZ
-	} else if imuOrientation == 7 { // flipCW270
+	case 7: // flipCW270
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, -rawGyroZ
-	} else {
-		// Go requires these to be initialized.
-		// If imuOrientation isn't 0-7, use default.
+	default: // default
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
 	}
