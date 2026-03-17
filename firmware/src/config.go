@@ -22,7 +22,7 @@ const (
 	TYPE_2 = false // Dual aileron T tail configuration
 	TYPE_3 = false // Single aileron V tail configuration
 	TYPE_4 = false // Dual aileron V tail configuration
-	TYPE_5 = true  // Elevon delta configuration
+	TYPE_5 = true  // Elevon delta configuration (with or without rudder)
 )
 
 // --- Board Orientation ---
@@ -30,7 +30,7 @@ const (
 	// default defined as chip on top, usb to the rear.
 	// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
 	// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
-	orientation = 0
+	orientation = 6
 )
 
 // --- Receiver Channel Mapping ----
@@ -45,7 +45,7 @@ const (
 
 // --- Servo reverse ---
 const (
-	// Set each to true if the servo should be reversed
+	// Set each to true if the servo should be reversed (default = false)
 	servo1reverse = false
 	servo2reverse = false
 	servo4reverse = false

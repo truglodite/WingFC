@@ -70,8 +70,8 @@ const (
 	microDPSToRadS = math.Pi / (180 * 1e6)
 
 	// PWM pulse width constants
-	MIN_PULSE_WIDTH_US = 1000
-	MAX_PULSE_WIDTH_US = 2000
+	MIN_PULSE_WIDTH_US = 988
+	MAX_PULSE_WIDTH_US = 2012
 
 	MIN_RX_VALUE     = 988
 	MAX_RX_VALUE     = 2012
@@ -450,25 +450,24 @@ imuCheck:
 				} else if TYPE_3 {
 					// Single aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput + yawOutput
-					servo4 = pitchOutput - yawOutput
+					servo2 = pitchOutput - yawOutput
+					servo4 = pitchOutput + yawOutput
 					servo5 = 0
 				} else if TYPE_4 {
 					// Dual aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput + yawOutput
-					servo4 = pitchOutput - yawOutput
+					servo2 = pitchOutput - yawOutput
+					servo4 = pitchOutput + yawOutput
 					servo5 = rollOutput
 				} else if TYPE_5 {
 					// Elevon delta
-					servo1 = rollOutput + pitchOutput
-					servo2 = rollOutput - pitchOutput
+					servo1 = rollOutput - pitchOutput
+					servo2 = rollOutput + pitchOutput
 					servo4 = yawOutput
 					servo5 = 0
 				}
 
 				// Convert control outputs to PWM pulse widths.
-				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MAX_PULSE_WIDTH_US, MIN_PULSE_WIDTH_US)
 				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
