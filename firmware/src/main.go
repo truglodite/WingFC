@@ -217,7 +217,7 @@ servoCh5Init:
 escInit:
 	if USE_DSHOT {
 		escPin = PWM_CH3_PIN
-		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput}) // error checking is apparently not needed for PinConfig
 		setESC(MIN_PULSE_WIDTH_US)
 		println("DShot configured for ESC.")
 	} else {

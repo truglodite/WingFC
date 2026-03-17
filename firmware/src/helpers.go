@@ -16,7 +16,7 @@ func readLSMData() {
 	}
 
 	// Map imu data based on board orientation configuration
-	switch imuOrientation {
+	switch orientation {
 	case 1: // CW90
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, rawGyroZ
