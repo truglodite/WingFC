@@ -103,6 +103,26 @@ type flightState int
 
 // main is the entry point for the TinyGo program.
 func main() {
+	// --- Hardware Setup ---
+	uart.Configure(machine.UARTConfig{
+		BaudRate: BAUD_RATE,
+		TX:       machine.UART_TX_PIN,
+		RX:       machine.UART_RX_PIN,
+	})
+	println("UART configured for receiver.")
+
+	// configure the onboard RGB LED (Low=on, High=off)
+	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	
+	packet := <-packetChan:
+	// Start the goroutine to read receiver packets asynchronously.
+	go readReceiver(packetChan)
+	
+	LastPacketTime = time.Now()
+	// A complete packet has been received.
+	processReceiverPacket(packet)
 	// ESC init right away to avoid leaving some esc's in a bad state
 	// Reset retries for the next component
 	setLED(1) // R for esc init
@@ -141,7 +161,10 @@ escInit:
 			println("CRITICAL: ESC PWM Init Failed")
 			return
 		}
-		// need to add way to calibrate pwm esc's
+		// Handle PWM esc calibration at bootup
+		while Channels[ThrottleChannel] >= HIGH_RX_VALUE {
+				setESC(MAX_PULSE_WIDTH_US)
+		}
 		setESC(MIN_PULSE_WIDTH_US)
 		println("PWM configured for ESC.")
 	}
@@ -152,19 +175,6 @@ escInit:
 	println("Author: Bryan Souza (github.com/BryanSouza91)")
 
 	println("Initializing...")
-
-	// --- Hardware Setup ---
-	uart.Configure(machine.UARTConfig{
-		BaudRate: BAUD_RATE,
-		TX:       machine.UART_TX_PIN,
-		RX:       machine.UART_RX_PIN,
-	})
-	println("UART configured for receiver.")
-
-	// configure the onboard RGB LED (Low=on, High=off)
-	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
 
 	setLED(1) // G for servo config
 
@@ -325,8 +335,6 @@ imuCheck:
 	flightState := FLIGHT_MODE
 	lastFlightState = FLIGHT_MODE
 
-	// Start the goroutine to read receiver packets asynchronously.
-	go readReceiver(packetChan)
 
 	// ticker to run the control loop at a fixed frequency matching Kalman filter.
 	ticker := time.NewTicker(time.Duration(dt * float64(time.Second)))
