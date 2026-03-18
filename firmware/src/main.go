@@ -115,11 +115,11 @@ func main() {
 	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	
-	packet := <-packetChan:
+
+	packet := <-packetChan
 	// Start the goroutine to read receiver packets asynchronously.
 	go readReceiver(packetChan)
-	
+
 	LastPacketTime = time.Now()
 	// A complete packet has been received.
 	processReceiverPacket(packet)
@@ -162,8 +162,8 @@ escInit:
 			return
 		}
 		// Handle PWM esc calibration at bootup
-		while Channels[ThrottleChannel] >= HIGH_RX_VALUE {
-				setESC(MAX_PULSE_WIDTH_US)
+		for Channels[ThrottleChannel] >= HIGH_RX_VALUE {
+			setESC(MAX_PULSE_WIDTH_US)
 		}
 		setESC(MIN_PULSE_WIDTH_US)
 		println("PWM configured for ESC.")
@@ -334,7 +334,6 @@ imuCheck:
 
 	flightState := FLIGHT_MODE
 	lastFlightState = FLIGHT_MODE
-
 
 	// ticker to run the control loop at a fixed frequency matching Kalman filter.
 	ticker := time.NewTicker(time.Duration(dt * float64(time.Second)))
