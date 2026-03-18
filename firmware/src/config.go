@@ -27,8 +27,10 @@ const (
 
 // --- Board Orientation ---
 const (
-	// default defined as chip on top, usb to the rear.
-	// Flip is defined along roll axis, cwX defined along yaw axis; just yaw, or flip first then yaw.
+	// The default orientation is defined as "chip on top, usb port aft".
+	// Orientations are relative to a fixed frame of reference (the airframe).
+	// Rotate CW only, or flip first then rotate CW (rotate with chip facing down).
+	// Flip is defined along roll axis, cwX is defined along yaw axis.
 	// default=0, cw90=1, cw180=2, cw270=3, flip=4, flipcw90=5, flipcw180=6, flipcw270=7
 	orientation = 6
 )
@@ -46,7 +48,7 @@ const (
 // --- Servo reverse ---
 const (
 	// Set each to true if the servo should be reversed (default = false)
-	servo1reverse = false
+	servo1reverse = true
 	servo2reverse = false
 	servo4reverse = false
 	servo5reverse = false
@@ -87,7 +89,7 @@ const (
 	MAX_ROLL_RATE_DEG = 600
 
 	// Maximum desired yaw rate in degrees/sec (default 100)
-	MAX_YAW_RATE_DEG = 100
+	MAX_YAW_RATE_DEG = 300
 
 	// Weighting for combining gyro/accel with input (default 0.5)
 	PID_WEIGHT = .7

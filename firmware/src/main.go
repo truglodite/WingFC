@@ -103,7 +103,49 @@ type flightState int
 
 // main is the entry point for the TinyGo program.
 func main() {
-	time.Sleep(2 * time.Second) // Wait for hardware to stabilize
+	// ESC init right away to avoid leaving some esc's in a bad state
+	// Reset retries for the next component
+	setLED(1) // R for esc init
+	var retries = 0
+escInit:
+	if USE_DSHOT {
+		escPin = PWM_CH3_PIN
+		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput}) // error checking is apparently not needed for PinConfig
+		setESC(MIN_PULSE_WIDTH_US)
+		println("DShot configured for ESC.")
+	} else {
+		escPWMConfig := machine.PWMConfig{
+			Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,
+		}
+		if err = pwm1.Configure(escPWMConfig); err != nil {
+			setLED(7) // RGB on esc init error
+			retries++
+			if retries < 5 {
+				time.Sleep(100 * time.Millisecond)
+				goto escInit
+			}
+			// Fallback or panic if max retries exceeded
+			println("CRITICAL: Servo PWM Channel 5 Init Failed")
+			return
+		}
+		escPeriodNs = escPWMConfig.Period
+		escCh, err = pwm1.Channel(PWM_CH3_PIN)
+		if err != nil {
+			setLED(7) // RGB on esc pwm init error
+			retries++
+			if retries < 5 {
+				time.Sleep(100 * time.Millisecond)
+				goto escInit
+			}
+			// Fallback or panic if max retries exceeded
+			println("CRITICAL: ESC PWM Init Failed")
+			return
+		}
+		// need to add way to calibrate pwm esc's
+		setESC(MIN_PULSE_WIDTH_US)
+		println("PWM configured for ESC.")
+	}
+	//time.Sleep(2 * time.Second) // Wait for hardware to stabilize
 	println("WingFC Flight Controller - Version", Version)
 	println("A TinyGo Flight Controller for Flying Wing Aircraft")
 	println("Source: github.com/BryanSouza91/WingFC")
@@ -126,7 +168,7 @@ func main() {
 
 	setLED(1) // G for servo config
 
-	var retries = 0
+	retries = 0
 servoPWMInit:
 	servoPWMConfig := machine.PWMConfig{
 		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY,
@@ -210,47 +252,6 @@ servoCh5Init:
 	// set servos 1, 2, 4, 5 (not yet 6) to subtrim values
 	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
-	// Reset retries for the next component
-	setLED(1) // R for esc init
-	retries = 0
-
-escInit:
-	if USE_DSHOT {
-		escPin = PWM_CH3_PIN
-		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput}) // error checking is apparently not needed for PinConfig
-		setESC(MIN_PULSE_WIDTH_US)
-		println("DShot configured for ESC.")
-	} else {
-		escPWMConfig := machine.PWMConfig{
-			Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,
-		}
-		if err = pwm1.Configure(escPWMConfig); err != nil {
-			setLED(7) // RGB on esc init error
-			retries++
-			if retries < 5 {
-				time.Sleep(100 * time.Millisecond)
-				goto escInit
-			}
-			// Fallback or panic if max retries exceeded
-			println("CRITICAL: Servo PWM Channel 5 Init Failed")
-			return
-		}
-		escPeriodNs = escPWMConfig.Period
-		escCh, err = pwm1.Channel(PWM_CH3_PIN)
-		if err != nil {
-			setLED(7) // RGB on esc pwm init error
-			retries++
-			if retries < 5 {
-				time.Sleep(100 * time.Millisecond)
-				goto escInit
-			}
-			// Fallback or panic if max retries exceeded
-			println("CRITICAL: ESC PWM Init Failed")
-			return
-		}
-		setESC(MIN_PULSE_WIDTH_US)
-		println("PWM configured for ESC.")
-	}
 
 	i2c.Configure(machine.I2CConfig{
 		Frequency: 400 * machine.KHz,
@@ -400,7 +401,8 @@ imuCheck:
 				// Get desired pitch, roll, and yaw rates from the RC receiver.
 				desiredPitchRate = mapRange(float64(Channels[ElevatorChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_PITCH_RATE, MAX_PITCH_RATE)
 				desiredRollRate = mapRange(float64(Channels[AileronChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_ROLL_RATE, MAX_ROLL_RATE)
-				desiredYawRate = mapRange(float64(Channels[RudderChannel]), MIN_RX_VALUE, MAX_RX_VALUE, -MAX_YAW_RATE, MAX_YAW_RATE)
+				// Standard RX Z is opposite of IMU Z
+				desiredYawRate = mapRange(float64(Channels[RudderChannel]), MAX_RX_VALUE, MIN_RX_VALUE, -MAX_YAW_RATE, MAX_YAW_RATE)
 
 				// Apply deadband to avoid small unwanted movements
 				if math.Abs(desiredPitchRate) < DEADBAND*math.Pi/180 {
@@ -461,8 +463,8 @@ imuCheck:
 					servo5 = rollOutput
 				} else if TYPE_5 {
 					// Elevon delta
-					servo1 = rollOutput - pitchOutput
-					servo2 = rollOutput + pitchOutput
+					servo1 = rollOutput + pitchOutput
+					servo2 = -rollOutput + pitchOutput
 					servo4 = yawOutput
 					servo5 = 0
 				}

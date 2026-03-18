@@ -27,17 +27,17 @@ func readLSMData() {
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, rawGyroZ
 	case 4: // flip
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, -rawAccelY, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, -rawGyroY, -rawGyroZ
+	case 5: // flipCW90
+		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, -rawAccelX, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, -rawGyroX, -rawGyroZ
+	case 6: // flipCW180
 		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, rawAccelY, -rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, rawGyroY, -rawGyroZ
-	case 5: // flipCW90
-		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, -rawAccelX, -rawAccelZ
-		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, -rawGyroX, -rawGyroZ
-	case 6: // flipCW180
-		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelX, -rawAccelY, -rawAccelZ
-		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroX, -rawGyroY, -rawGyroZ
 	case 7: // flipCW270
-		rawAccelXo, rawAccelYo, rawAccelZo = -rawAccelY, rawAccelX, -rawAccelZ
-		rawGyroXo, rawGyroYo, rawGyroZo = -rawGyroY, rawGyroX, -rawGyroZ
+		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelY, rawAccelX, -rawAccelZ
+		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroY, rawGyroX, -rawGyroZ
 	default: // default
 		rawAccelXo, rawAccelYo, rawAccelZo = rawAccelX, rawAccelY, rawAccelZ
 		rawGyroXo, rawGyroYo, rawGyroZo = rawGyroX, rawGyroY, rawGyroZ
