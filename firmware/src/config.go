@@ -17,12 +17,13 @@ const (
 
 // --- Aircraft Type ---
 const (
-	// Set only one to true (default TYPE_5 = true)
-	TYPE_1 = false // Single aileron T tail configuration
-	TYPE_2 = false // Dual aileron T tail configuration
-	TYPE_3 = false // Single aileron V tail configuration
-	TYPE_4 = false // Dual aileron V tail configuration
-	TYPE_5 = true  // Elevon delta configuration (with or without rudder)
+	// Aircraft types
+	// 1 = Single aileron T tail
+	// 2 = Dual aileron T tail
+	// 3 = Single aileron V tail
+	// 4 = Dual aileron V tail confurtion
+	// 5 = Elevon delta (with or without rudder)
+	AircraftType = 5
 )
 
 // --- Board Orientation ---
@@ -37,12 +38,16 @@ const (
 
 // --- Receiver Channel Mapping ----
 const (
-	AileronChannel    = 0 // CH1
-	ElevatorChannel   = 1 // CH2
-	ThrottleChannel   = 2 // CH3
-	RudderChannel     = 3 // CH4
-	ArmChannel        = 4 // CH5
-	ManualModeChannel = 6 // CH7
+	AileronChannel    = 0  // CH1
+	ElevatorChannel   = 1  // CH2
+	ThrottleChannel   = 2  // CH3
+	RudderChannel     = 3  // CH4
+	ArmChannel        = 4  // CH5
+	ManualModeChannel = 6  // CH7
+	TuningChannelA    = 7  // CH8
+	TuningChannelB    = 8  // CH9
+	TuningChannelC    = 9  // CH10
+	TuningChannelD    = 10 // CH11
 )
 
 // --- Servo reverse ---
@@ -96,9 +101,37 @@ const (
 
 	// LPF alpha for gyro/accel fusion (default 0.2)
 	LPF_ALPHA = 0.2
+)
 
+var (
 	// PID gains (P, I, D) for the roll, pitch, and yaw controllers
 	pP, pI, pD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
 	rP, rI, rD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
 	yP, yI, yD = 1.0, 0.4, 0.01 // default 1., 0.4, 0.01
+)
+
+// --- In Flight Tuning Parameters ---
+// TuneParameterX = Y
+// Y = 0:  (default)
+// Y = 1: Pitch P
+// Y = 2: Roll P
+// Y = 3: Yaw P
+// Y = 4: Pitch I
+// TuneParameterXmax/min = max and min values available throughout TuningChannelX range
+const (
+	TuneParameterA    = 1
+	TuneParameterAmin = 1.0
+	TuneParameterAmax = 3.0
+
+	TuneParameterB    = 2
+	TuneParameterBmin = 1.0
+	TuneParameterBmax = 3.0
+
+	TuneParameterC    = 3
+	TuneParameterCmin = 0.5
+	TuneParameterCmax = 2.0
+
+	TuneParameterD    = 0
+	TuneParameterDmin = 1.0
+	TuneParameterDmax = 3.0
 )

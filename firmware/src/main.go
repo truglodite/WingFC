@@ -28,9 +28,10 @@ var (
 	pwm1          = machine.PWM1
 	pwmCh1        uint8
 	pwmCh2        uint8
+	pwmCh3        uint8
 	pwmCh4        uint8
 	pwmCh5        uint8
-	escCh         uint8
+	pwmCh6        uint8
 	escPin        machine.Pin
 	servoPeriodNs uint64
 	escPeriodNs   uint64
@@ -88,6 +89,7 @@ const (
 	PWM_CH3_PIN = machine.D2 // Servo 3
 	PWM_CH4_PIN = machine.D3 // Servo 4
 	PWM_CH5_PIN = machine.D4 // Servo 5
+	PWM_CH6_PIN = machine.D5 // Servo 6
 
 	// Fail-safe constants
 	// for CSRF, we need to wait at least 1second
@@ -208,8 +210,21 @@ servoCh5Init:
 		println("CRITICAL: Servo PWM Channel 5 Init Failed")
 		return
 	}
-	// set servos 1, 2, 4, 5 (not yet 6) to subtrim values
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+servoCh6Init:
+	pwmCh6, err = pwm0.Channel(PWM_CH6_PIN)
+	if err != nil {
+		setLED(6) // GB on servo error
+		retries++
+		if retries < 5 {
+			time.Sleep(100 * time.Millisecond)
+			goto servoCh6Init
+		}
+		// Fallback or panic if max retries exceeded
+		println("CRITICAL: Servo PWM Channel 5 Init Failed")
+		return
+	}
+	// set servos 1, 2, 4, 5, and 6 to subtrim values
+	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	println("PWM configured for servos.")
 
 	// ESC init right away to avoid leaving some esc's in a bad state
@@ -238,7 +253,7 @@ escInit:
 			return
 		}
 		escPeriodNs = escPWMConfig.Period
-		escCh, err = pwm1.Channel(PWM_CH3_PIN)
+		pwmCh3, err = pwm1.Channel(PWM_CH3_PIN)
 		if err != nil {
 			setLED(7) // RGB on esc pwm init error
 			retries++
@@ -313,7 +328,7 @@ imuCheck:
 	println("Initial calibration")
 	println("Calibrating Gyro... Keep gyro still!")
 	// Keep outputs at neutral and ESC at zero
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 	setESC(MIN_PULSE_WIDTH_US)
 	calibrate()
 
@@ -437,34 +452,30 @@ imuCheck:
 					yawOutput = desiredYawRate
 				}
 
-				// Mix control outputs dependent on aircraft type configuration
-				var servo1, servo2, servo4, servo5 float64
-				if TYPE_1 {
-					// Single aileron T tail
+				// Mix control outputs based on aircraft type configuration
+				var servo1, servo2, servo4, servo5, servo6 float64
+				switch AircraftType {
+				case 1: // Single aileron T tail
 					servo1 = rollOutput
 					servo2 = pitchOutput
 					servo4 = yawOutput
 					servo5 = 0
-				} else if TYPE_2 {
-					// Dual aileron T tail
+				case 2: // Dual aileron T tail
 					servo1 = rollOutput
 					servo2 = pitchOutput
 					servo4 = yawOutput
 					servo5 = rollOutput
-				} else if TYPE_3 {
-					// Single aileron V tail
+				case 3: // Single aileron V tail
 					servo1 = rollOutput
 					servo2 = pitchOutput - yawOutput
 					servo4 = pitchOutput + yawOutput
 					servo5 = 0
-				} else if TYPE_4 {
-					// Dual aileron V tail
+				case 4: // Dual aileron V tail
 					servo1 = rollOutput
 					servo2 = pitchOutput - yawOutput
 					servo4 = pitchOutput + yawOutput
 					servo5 = rollOutput
-				} else if TYPE_5 {
-					// Elevon delta
+				default: // Elevon delta
 					servo1 = rollOutput + pitchOutput
 					servo2 = -rollOutput + pitchOutput
 					servo4 = yawOutput
@@ -476,8 +487,9 @@ imuCheck:
 				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo6 = mapRange(float64(servo6), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 
-				// Reverse servos as required
+				// Reverse servos if required
 				if servo1reverse {
 					servo1 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo1
 				}
@@ -490,30 +502,56 @@ imuCheck:
 				if servo5reverse {
 					servo5 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo5
 				}
+				if servo6reverse {
+					servo6 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo6
+				}
 
 				// Constrain pulse widths to a valid range.
 				servo1pulse := uint32(constrain(servo1, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 				servo2pulse := uint32(constrain(servo2, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 				servo4pulse := uint32(constrain(servo4, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 				servo5pulse := uint32(constrain(servo5, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo6pulse := uint32(constrain(servo6, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 
 				// Set the PWM signals for the servos
-				setServo(servo1pulse, servo2pulse, servo4pulse, servo5pulse)
+				setServo(servo1pulse, servo2pulse, servo4pulse, servo5pulse, servo6pulse)
 
 				// Arming engages throttle control Disarming disengages throttle control
 				// Stabilization takes place regardless
 				// In armed mode, set the ESC from ThrottleChannel
-
-				//trug
 				if armed {
 					// Handle ESC signal from ThrottleChannel
-
 					escPulse = uint32(mapRange(float64(Channels[ThrottleChannel]), MIN_RX_VALUE, MAX_RX_VALUE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
 				} else {
 					// This is disarmed mode, set ESC to minimum
 					escPulse = MIN_PULSE_WIDTH_US
 				}
 				setESC(escPulse)
+
+				switch TuneParameterA {
+				case 1: // pitch P
+					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterAmin), float64(TuneParameterAmax))
+				default:
+					return
+				}
+				switch TuneParameterB {
+				case 2: // roll P
+					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterBmin), float64(TuneParameterBmax))
+				default:
+					return
+				}
+				switch TuneParameterC {
+				case 3: // yaw P
+					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterCmin), float64(TuneParameterCmax))
+				default:
+					return
+				}
+				switch TuneParameterD {
+				case 1: // pitch P
+					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterDmin), float64(TuneParameterDmax))
+				default:
+					return
+				}
 				// Print status and sensor data for debugging
 				// Adding these statements can lead to the control loop crashing to failsafe if higher packet rates are used.
 				//println("    Pin       ,    Pout      ,    Rin       ,     Rout     , armed")
@@ -526,7 +564,7 @@ imuCheck:
 				//println()
 
 			case FAILSAFE:
-				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
 				setESC(MIN_PULSE_WIDTH_US)
 				print(time.Now().UnixMilli())
 				println(" ---------------- Receiver failsafe")

@@ -111,7 +111,7 @@ func mapRange[T constraints.Float](value, fromMin, fromMax, toMin, toMax T) T {
 
 // setServo sets the PWM duty cycle for the aileron and elevator servos.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
-func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse uint32) {
+func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse, servo6pulse uint32) {
 	// The Period() function is not available. We use the saved period instead.
 	top_value := pwm0.Top()
 
@@ -130,6 +130,10 @@ func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse uint32) {
 	// Calculate the duty cycle for the fifth servo.
 	servo5 := uint32(uint64(servo5pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
 	pwm0.Set(pwmCh5, servo5)
+
+	// Calculate the duty cycle for the 6th servo.
+	servo6 := uint32(uint64(servo6pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	pwm0.Set(pwmCh6, servo6)
 }
 
 // setESC sets the PWM duty cycle for the ESC.
@@ -156,7 +160,7 @@ func setESC(servo3pulse uint32) {
 
 	// Calculate the duty cycle for the ESC.
 	duty := uint32(uint64(servo3pulse) * 1000 * uint64(top_value) / uint64(escPeriodNs))
-	pwm1.Set(escCh, duty)
+	pwm1.Set(pwmCh3, duty)
 }
 
 // setLED sets the output state of the built in RGB LED.
