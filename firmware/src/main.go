@@ -103,6 +103,10 @@ type flightState int
 
 // main is the entry point for the TinyGo program.
 func main() {
+	// configure the onboard RGB LED (Low=on, High=off)
+	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
 	// ESC init right away to avoid leaving some esc's in a bad state
 	// Reset retries for the next component
 	setLED(1) // R for esc init
@@ -160,11 +164,6 @@ escInit:
 		RX:       machine.UART_RX_PIN,
 	})
 	println("UART configured for receiver.")
-
-	// configure the onboard RGB LED (Low=on, High=off)
-	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
 
 	setLED(1) // G for servo config
 
