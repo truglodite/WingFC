@@ -296,9 +296,7 @@ imuCheck:
 		println("CRITICAL: IMU Not Connected")
 		return
 	}
-	// Reset retries for the next component
 	setLED(0) // OFF after boot checks
-	retries = 0
 
 	println("LSM6DS3TR IMU configured and initialized.")
 
@@ -367,9 +365,11 @@ imuCheck:
 				// Check for arm/disarm first every loop
 				if Channels[ArmChannel] <= HIGH_RX_VALUE {
 					//println("Disarmed.")
+					setLED(2) // G while disarmed
 					armed = false
 				} else {
 					//println("Armed!")
+					setLED(3) // B while armed
 					armed = true
 				}
 
@@ -528,6 +528,7 @@ imuCheck:
 				setESC(MIN_PULSE_WIDTH_US)
 				print(time.Now().UnixMilli())
 				println(" ---------------- Receiver failsafe")
+				setLED(1) // R during failsafe
 
 				if time.Since(LastPacketTime).Milliseconds() <= FAILSAFE_TIMEOUT_MS {
 					lastFlightState = flightState
