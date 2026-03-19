@@ -1,7 +1,7 @@
 package main
 
 // WingFC Configuration
-// All user-configurable parameters and hardware mappings
+// All user-configurable parameters (and hardware mappings?)
 //
 // All the configurable values are defined here, making it easy to tune the
 // flight controller without changing the main application logic.
@@ -11,7 +11,6 @@ const (
 	// Number of supported RC channels (default 12)
 	// elrs 50hz, 150hz, 250hz, 500hz packet rates w/ wide switch mode = 12ch
 	// elrs 100hz/full, 333hz/full packet rates = 8ch or 16ch
-
 	NumChannels = 12
 )
 
@@ -71,7 +70,7 @@ const (
 
 // --- Hardware Output Configuration ---
 const (
-	// Servo output frequency (default 50Hz)
+	// Servo output frequency (default_0 = 50Hz, default_2 = 50)
 	// FREQUENCY_0 for servos 1, 2, 4, and 5
 	// FREQUENCY_2 for servo 6
 	// Analog servos use 50Hz, digital servos may use 100Hz 250Hz 333Hz etc.

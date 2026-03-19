@@ -37,6 +37,7 @@ var (
 	pwm0periodNs uint64
 	pwm2periodNs uint64
 	escPeriodNs  uint64
+	escPulse     uint32
 
 	// Control system components
 	pitchPID       *PIDController
@@ -48,13 +49,12 @@ var (
 	imuYawMeas     float64
 	imuOrientation = orientation
 
-	// IMU calibration
+	// IMU variables
 	accelXSum, accelYSum, accelZSum, accelBiasX, accelBiasY, accelBiasZ float64 = 0., 0., 0., 0., 0., 0.
 	gyroXSum, gyroYSum, gyroZSum, gyroBiasX, gyroBiasY, gyroBiasZ       float64 = 0., 0., 0., 0., 0., 0.
 	xA, yA, zA, xG, yG, zG                                              int32
 	desiredPitchRate, desiredRollRate, desiredYawRate                   float64
 	pitchOutput, rollOutput, yawOutput                                  float64
-	escPulse                                                            uint32
 
 	// RC Channels
 	Channels        [NumChannels]uint16
@@ -88,7 +88,7 @@ const (
 	// --- Hardware Mappings ---
 	PWM_CH1_PIN = machine.D0 // Servo 1
 	PWM_CH2_PIN = machine.D1 // Servo 2
-	PWM_CH3_PIN = machine.D2 // Servo 3
+	PWM_CH3_PIN = machine.D2 // ESC
 	PWM_CH4_PIN = machine.D3 // Servo 4
 	PWM_CH5_PIN = machine.D4 // Servo 5
 	PWM_CH6_PIN = machine.D5 // Servo 6

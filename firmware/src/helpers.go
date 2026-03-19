@@ -139,14 +139,14 @@ func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse, servo6pulse ui
 
 // setESC sets the PWM duty cycle for the ESC.
 // It converts a pulse width in microseconds to a value relative to the PWM period.
-func setESC(servo3pulse uint32) {
+func setESC(throttlePulse uint32) {
 	if USE_DSHOT {
 		// Map pulse width (microseconds) to DShot throttle range (0..2047)
 		var throttle uint16
-		if servo3pulse <= MIN_PULSE_WIDTH_US {
+		if throttlePulse <= MIN_PULSE_WIDTH_US {
 			throttle = 0
 		} else {
-			val := uint16(mapRange(float64(servo3pulse), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
+			val := uint16(mapRange(float64(throttlePulse), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
 			if val > 2047 {
 				val = 2047
 			}
@@ -160,7 +160,7 @@ func setESC(servo3pulse uint32) {
 	top_value := pwm1.Top()
 
 	// Calculate the duty cycle for the ESC.
-	duty := uint32(uint64(servo3pulse) * 1000 * uint64(top_value) / uint64(escPeriodNs))
+	duty := uint32(uint64(throttlePulse) * 1000 * uint64(top_value) / uint64(escPeriodNs))
 	pwm1.Set(pwmCh3, duty)
 }
 
