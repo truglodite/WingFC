@@ -328,7 +328,7 @@ imuCheck:
 	println("Initial calibration")
 	println("Calibrating Gyro... Keep gyro still!")
 	// Keep outputs at neutral and ESC at zero
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
 	setESC(MIN_PULSE_WIDTH_US)
 	calibrate()
 
