@@ -24,8 +24,9 @@ var (
 	blueLED  = machine.LED_BLUE
 
 	// PWM controllers and channels
-	pwm0          = machine.PWM0
-	pwm1          = machine.PWM1
+	pwm0          = machine.PWM0 // servos 1, 2, 4, and 5
+	pwm1          = machine.PWM1 // esc
+	pwm2          = machine.PWM2 // servo 6
 	pwmCh1        uint8
 	pwmCh2        uint8
 	pwmCh3        uint8
@@ -127,24 +128,25 @@ func main() {
 	})
 	println("UART configured for receiver.")
 
-	setLED(1) // G for servo config
-
+	setLED(1) // G for servo pwm init
 	var retries = 0
-servoPWMInit:
-	servoPWMConfig := machine.PWMConfig{
+
+servoPWM0Init:
+	servoPWM0Config := machine.PWMConfig{
 		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY,
 	}
-	if err := pwm0.Configure(servoPWMConfig); err != nil {
+	if err := pwm0.Configure(servoPWM0Config); err != nil {
 		setLED(4) // RG on pwm0 init error
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
-			goto servoPWMInit
+			goto servoPWM0Init
 		}
 		// Fallback or panic if max retries exceeded
-		println("CRITICAL: Servo PWM Init Failed")
+		println("CRITICAL: Servo PWM0 Init Failed")
 		return
 	}
+
 	// Reset retries for the next component
 	setLED(2) // G for servo inits
 	retries = 0
@@ -210,8 +212,29 @@ servoCh5Init:
 		println("CRITICAL: Servo PWM Channel 5 Init Failed")
 		return
 	}
+
+	setLED(1) // G for servo pwm init
+	var retries = 0
+
+servoPWM2Init:
+	servoPWM2Config := machine.PWMConfig{
+		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY,
+	}
+	if err := pwm0.Configure(servoPWM2Config); err != nil {
+		setLED(4) // RG on pwm0 init error
+		retries++
+		if retries < 5 {
+			time.Sleep(100 * time.Millisecond)
+			goto servoPWM2Init
+		}
+		// Fallback or panic if max retries exceeded
+		println("CRITICAL: Servo PWM2 Init Failed")
+		return
+	}
+	setLED(2)
+	retries = 0
 servoCh6Init:
-	pwmCh6, err = pwm0.Channel(PWM_CH6_PIN)
+	pwmCh6, err = pwm2.Channel(PWM_CH6_PIN)
 	if err != nil {
 		setLED(6) // GB on servo error
 		retries++

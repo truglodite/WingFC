@@ -63,8 +63,8 @@ const (
 // --- Servo Trim ---
 // default 1500
 const (
-	servo1trim = 1500
-	servo2trim = 1500
+	servo1trim = 1498
+	servo2trim = 1498
 	servo4trim = 1500
 	servo5trim = 1500
 	servo6trim = 1500
@@ -73,12 +73,12 @@ const (
 // --- Servo Endpoints ---
 // default [1000,2000]
 const (
-	servo1min = 1000
-	servo1max = 2000
-	servo2min = 1000
-	servo2max = 2000
-	servo4min = 1000
-	servo4max = 2000
+	servo1min = 886
+	servo1max = 2114
+	servo2min = 989
+	servo2max = 2012
+	servo4min = 1080
+	servo4max = 2176
 	servo5min = 1000
 	servo5max = 2000
 	servo6min = 1000

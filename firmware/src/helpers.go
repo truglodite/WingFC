@@ -133,7 +133,7 @@ func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse, servo6pulse ui
 
 	// Calculate the duty cycle for the 6th servo.
 	servo6 := uint32(uint64(servo6pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
-	pwm0.Set(pwmCh6, servo6)
+	pwm2.Set(pwmCh6, servo6)
 }
 
 // setESC sets the PWM duty cycle for the ESC.
