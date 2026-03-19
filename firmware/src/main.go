@@ -473,9 +473,9 @@ imuCheck:
 					rollOutput = rollPID.Update(rollError, dt) * PID_WEIGHT
 					yawOutput = yawPID.Update(yawError, dt) * PID_WEIGHT
 				} else { // use rc inputs if in manual mode
-					pitchPID.integral = 0 // reset integral term in manual mode to prevent windup
-					rollPID.integral = 0
-					yawPID.integral = 0
+					pitchPID.Reset() // reset integral term in manual mode to prevent windup
+					rollPID.Reset()
+					yawPID.Reset()
 					pitchOutput = desiredPitchRate
 					rollOutput = desiredRollRate
 					yawOutput = desiredYawRate
