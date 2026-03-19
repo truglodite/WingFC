@@ -452,7 +452,12 @@ imuCheck:
 					yawOutput = desiredYawRate
 				}
 
-				// Mix control outputs based on aircraft type configuration
+				// Convert control outputs to servo pulse widths.
+				rollOutput = mapRange(float64(rollOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
+				pitchOutput = mapRange(float64(pitchOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
+				yawOutput = mapRange(float64(yawOutput), -MAX_YAW_RATE, MAX_YAW_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
+
+				// Mix servos based on aircraft type configuration
 				var servo1, servo2, servo4, servo5, servo6 float64
 				switch AircraftType {
 				case 1: // Single aileron T tail
@@ -482,14 +487,7 @@ imuCheck:
 					servo5 = 0
 				}
 
-				// Convert control outputs to PWM pulse widths.
-				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, servo1min, servo1max)
-				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, servo2min, servo2max)
-				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, servo4min, servo4max)
-				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, servo5min, servo6max)
-				servo6 = mapRange(float64(servo6), -MAX_YAW_RATE, MAX_YAW_RATE, servo6min, servo6max)
-
-				// Reverse servos if required
+				// Reverse servo if required
 				if servo1reverse {
 					servo1 = servo1max + servo1min - servo1
 				}
@@ -506,14 +504,14 @@ imuCheck:
 					servo6 = servo6max + servo6min - servo6
 				}
 
-				// Process servo midpoint trims
+				// Handle servo midpoint trims
 				servo1 = servo1 + servo1trim - 1500
 				servo2 = servo2 + servo2trim - 1500
 				servo4 = servo4 + servo4trim - 1500
 				servo5 = servo5 + servo5trim - 1500
 				servo6 = servo6 + servo6trim - 1500
 
-				// Constrain pulse widths to a valid range.
+				// Constrain servo pulse widths to a valid range.
 				servo1pulse := uint32(constrain(servo1, servo1min, servo1max))
 				servo2pulse := uint32(constrain(servo2, servo2min, servo2max))
 				servo4pulse := uint32(constrain(servo4, servo4min, servo4max))
