@@ -24,18 +24,19 @@ var (
 	blueLED  = machine.LED_BLUE
 
 	// PWM controllers and channels
-	pwm0          = machine.PWM0 // servos 1, 2, 4, and 5
-	pwm1          = machine.PWM1 // esc
-	pwm2          = machine.PWM2 // servo 6
-	pwmCh1        uint8
-	pwmCh2        uint8
-	pwmCh3        uint8
-	pwmCh4        uint8
-	pwmCh5        uint8
-	pwmCh6        uint8
-	escPin        machine.Pin
-	servoPeriodNs uint64
-	escPeriodNs   uint64
+	pwm0         = machine.PWM0 // servos 1, 2, 4, and 5
+	pwm1         = machine.PWM1 // esc
+	pwm2         = machine.PWM2 // servo 6
+	pwmCh1       uint8
+	pwmCh2       uint8
+	pwmCh3       uint8
+	pwmCh4       uint8
+	pwmCh5       uint8
+	pwmCh6       uint8
+	escPin       machine.Pin
+	pwm0periodNs uint64
+	pwm2periodNs uint64
+	escPeriodNs  uint64
 
 	// Control system components
 	pitchPID       *PIDController
@@ -128,7 +129,7 @@ func main() {
 	})
 	println("UART configured for receiver.")
 
-	setLED(1) // G for servo pwm init
+	setLED(1) // R for servo pwm init
 	var retries = 0
 
 servoPWM0Init:
@@ -151,7 +152,7 @@ servoPWM0Init:
 	setLED(2) // G for servo inits
 	retries = 0
 servoCh1Init:
-	servoPeriodNs = servoPWMConfig.Period
+	pwm0periodNs = servoPWM0Config.Period
 	pwmCh1, err = pwm0.Channel(PWM_CH1_PIN)
 	if err != nil {
 		setLED(6) // GB on servo init error
@@ -213,8 +214,8 @@ servoCh5Init:
 		return
 	}
 
-	setLED(1) // G for servo pwm init
-	var retries = 0
+	setLED(1) // R for servo pwm init
+	retries = 0
 
 servoPWM2Init:
 	servoPWM2Config := machine.PWMConfig{
@@ -231,9 +232,11 @@ servoPWM2Init:
 		println("CRITICAL: Servo PWM2 Init Failed")
 		return
 	}
-	setLED(2)
+
+	setLED(2) // G for servo inits
 	retries = 0
 servoCh6Init:
+	pwm2periodNs = servoPWM2Config.Period
 	pwmCh6, err = pwm2.Channel(PWM_CH6_PIN)
 	if err != nil {
 		setLED(6) // GB on servo error
@@ -243,7 +246,7 @@ servoCh6Init:
 			goto servoCh6Init
 		}
 		// Fallback or panic if max retries exceeded
-		println("CRITICAL: Servo PWM Channel 5 Init Failed")
+		println("CRITICAL: Servo PWM Channel 6 Init Failed")
 		return
 	}
 	// set servos 1, 2, 4, 5, and 6 to subtrim values
@@ -477,7 +480,7 @@ imuCheck:
 
 				// Convert control outputs to servo pulse widths.
 				rollOutput = mapRange(float64(rollOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
-				pitchOutput = mapRange(float64(pitchOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
+				pitchOutput = mapRange(float64(pitchOutput), -MAX_PITCH_RATE, MAX_PITCH_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
 				yawOutput = mapRange(float64(yawOutput), -MAX_YAW_RATE, MAX_YAW_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
 
 				// Mix servos based on aircraft type configuration
@@ -560,25 +563,25 @@ imuCheck:
 				case 1: // pitch P
 					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterAmin), float64(TuneParameterAmax))
 				default:
-					return
+
 				}
 				switch TuneParameterB {
 				case 2: // roll P
 					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterBmin), float64(TuneParameterBmax))
 				default:
-					return
+
 				}
 				switch TuneParameterC {
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterCmin), float64(TuneParameterCmax))
 				default:
-					return
+
 				}
 				switch TuneParameterD {
 				case 1: // pitch P
 					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterDmin), float64(TuneParameterDmax))
 				default:
-					return
+
 				}
 				// Print status and sensor data for debugging
 				// Adding these statements can lead to the control loop crashing to failsafe if higher packet rates are used.

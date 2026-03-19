@@ -113,26 +113,27 @@ func mapRange[T constraints.Float](value, fromMin, fromMax, toMin, toMax T) T {
 // It converts a pulse width in microseconds to a value relative to the PWM period.
 func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse, servo6pulse uint32) {
 	// The Period() function is not available. We use the saved period instead.
-	top_value := pwm0.Top()
+	top_value0 := pwm0.Top()
+	top_value2 := pwm2.Top()
 
 	// Calculate the duty cycle for the left servo.
-	servo1 := uint32(uint64(servo1pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	servo1 := uint32(uint64(servo1pulse) * 1000 * uint64(top_value0) / uint64(pwm0periodNs))
 	pwm0.Set(pwmCh1, servo1)
 
 	// Calculate the duty cycle for the right servo.
-	servo2 := uint32(uint64(servo2Pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	servo2 := uint32(uint64(servo2Pulse) * 1000 * uint64(top_value0) / uint64(pwm0periodNs))
 	pwm0.Set(pwmCh2, servo2)
 
 	// Calculate the duty cycle for the rudder servo.
-	servo4 := uint32(uint64(servo4Pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	servo4 := uint32(uint64(servo4Pulse) * 1000 * uint64(top_value0) / uint64(pwm0periodNs))
 	pwm0.Set(pwmCh4, servo4)
 
 	// Calculate the duty cycle for the fifth servo.
-	servo5 := uint32(uint64(servo5pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	servo5 := uint32(uint64(servo5pulse) * 1000 * uint64(top_value0) / uint64(pwm0periodNs))
 	pwm0.Set(pwmCh5, servo5)
 
 	// Calculate the duty cycle for the 6th servo.
-	servo6 := uint32(uint64(servo6pulse) * 1000 * uint64(top_value) / uint64(servoPeriodNs))
+	servo6 := uint32(uint64(servo6pulse) * 1000 * uint64(top_value2) / uint64(pwm2periodNs))
 	pwm2.Set(pwmCh6, servo6)
 }
 
