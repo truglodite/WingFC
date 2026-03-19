@@ -531,13 +531,13 @@ imuCheck:
 				}
 
 				// Handle servo midpoint trims
-				servo1 = servo1 + servo1trim - 1500
-				servo2 = servo2 + servo2trim - 1500
-				servo4 = servo4 + servo4trim - 1500
-				servo5 = servo5 + servo5trim - 1500
-				servo6 = servo6 + servo6trim - 1500
+				servo1 = servo1 + servo1trim - NEUTRAL_RX_VALUE
+				servo2 = servo2 + servo2trim - NEUTRAL_RX_VALUE
+				servo4 = servo4 + servo4trim - NEUTRAL_RX_VALUE
+				servo5 = servo5 + servo5trim - NEUTRAL_RX_VALUE
+				servo6 = servo6 + servo6trim - NEUTRAL_RX_VALUE
 
-				// Constrain servo pulse widths to a valid range.
+				// Constrain servo pulse widths to configured endpoints.
 				servo1pulse := uint32(constrain(servo1, servo1min, servo1max))
 				servo2pulse := uint32(constrain(servo2, servo2min, servo2max))
 				servo4pulse := uint32(constrain(servo4, servo4min, servo4max))
