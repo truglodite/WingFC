@@ -498,17 +498,17 @@ imuCheck:
 					servo5 = rollOutput
 				case 3: // Single aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput - yawOutput
-					servo4 = pitchOutput + yawOutput
+					servo2 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
+					servo4 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
 					servo5 = 0
 				case 4: // Dual aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput - yawOutput
-					servo4 = pitchOutput + yawOutput
+					servo2 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
+					servo4 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
 					servo5 = rollOutput
 				default: // Elevon delta
-					servo1 = rollOutput + pitchOutput
-					servo2 = -rollOutput + pitchOutput
+					servo1 = rollOutput + pitchOutput - NEUTRAL_RX_VALUE
+					servo2 = -rollOutput + pitchOutput + NEUTRAL_RX_VALUE
 					servo4 = yawOutput
 					servo5 = 0
 				}
