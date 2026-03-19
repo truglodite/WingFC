@@ -113,13 +113,13 @@ const (
 // --- Flight Control Parameters ---
 const (
 	// Maximum desired pitch rate in degrees/sec (default 200)
-	MAX_PITCH_RATE_DEG = 600
+	MAX_PITCH_RATE_DEG = 200
 
-	// Maximum desired roll rate in degrees/sec (default 600)
-	MAX_ROLL_RATE_DEG = 600
+	// Maximum desired roll rate in degrees/sec (default 500)
+	MAX_ROLL_RATE_DEG = 500
 
 	// Maximum desired yaw rate in degrees/sec (default 100)
-	MAX_YAW_RATE_DEG = 300
+	MAX_YAW_RATE_DEG = 100
 
 	// Weighting for combining gyro/accel with input (default 0.5)
 	PID_WEIGHT = .7
@@ -143,6 +143,12 @@ var (
 // 2: Roll P
 // 3: Yaw P
 // 4: Pitch I
+// 5: Roll I
+// 6: Yaw I
+// 7: Pitch D
+// 8: Roll D
+// 9: Yaw D
+// DO NOT set any tuning parameter more than once!!!
 // TuneParameterXmax/min = max and min values available using full TuningChannelX range (988-2012)
 const (
 	TuneParameterA    = 1

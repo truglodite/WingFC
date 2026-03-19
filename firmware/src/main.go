@@ -559,19 +559,32 @@ imuCheck:
 				}
 				setESC(escPulse)
 
+				// Handle in flight tuning
 				switch TuneParameterA {
 				case 1: // pitch P
 					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+				case 2: // roll P
+					rP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+				case 3: // yaw P
+					yP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
 				default:
 
 				}
 				switch TuneParameterB {
+				case 1: // pitch P
+					pP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
 				case 2: // roll P
 					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+				case 3: // yaw P
+					yP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
 				default:
 
 				}
 				switch TuneParameterC {
+				case 1: // pitch P
+					pP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+				case 2: // roll P
+					rP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
 				default:
@@ -580,6 +593,10 @@ imuCheck:
 				switch TuneParameterD {
 				case 1: // pitch P
 					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+				case 2: // roll P
+					rP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+				case 3: // yaw P
+					yP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
 				default:
 
 				}
