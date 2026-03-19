@@ -82,10 +82,13 @@ const (
 // --- Hardware Output Configuration ---
 const (
 	// Servo output frequency (default 50Hz)
+	// FREQUENCY_0 for servos 1, 2, 4, and 5
+	// FREQUENCY_2 for servo 6
 	// Analog servos use 50Hz, digital servos may use 100Hz 250Hz 333Hz etc.
-	SERVO_PWM_FREQUENCY = 50
+	SERVO_PWM_FREQUENCY_0 = 50
+	SERVO_PWM_FREQUENCY_2 = 50
 
-	// ESC Frequency (default 50)
+	// PWM ESC Frequency (default 50)
 	// Common analog esc's use 50Hz. Another common ESC frequency is 400Hz
 	ESC_PWM_FREQUENCY = 50
 

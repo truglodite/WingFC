@@ -134,7 +134,7 @@ func main() {
 
 servoPWM0Init:
 	servoPWM0Config := machine.PWMConfig{
-		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY,
+		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY_0,
 	}
 	if err := pwm0.Configure(servoPWM0Config); err != nil {
 		setLED(4) // RG on pwm0 init error
@@ -219,7 +219,7 @@ servoCh5Init:
 
 servoPWM2Init:
 	servoPWM2Config := machine.PWMConfig{
-		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY,
+		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY_2,
 	}
 	if err := pwm0.Configure(servoPWM2Config); err != nil {
 		setLED(4) // RG on pwm0 init error
