@@ -483,35 +483,42 @@ imuCheck:
 				}
 
 				// Convert control outputs to PWM pulse widths.
-				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
-				servo6 = mapRange(float64(servo6), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				servo1 = mapRange(float64(servo1), -MAX_ROLL_RATE, MAX_ROLL_RATE, servo1min, servo1max)
+				servo2 = mapRange(float64(servo2), -MAX_ROLL_RATE, MAX_ROLL_RATE, servo2min, servo2max)
+				servo4 = mapRange(float64(servo4), -MAX_YAW_RATE, MAX_YAW_RATE, servo4min, servo4max)
+				servo5 = mapRange(float64(servo5), -MAX_YAW_RATE, MAX_YAW_RATE, servo5min, servo6max)
+				servo6 = mapRange(float64(servo6), -MAX_YAW_RATE, MAX_YAW_RATE, servo6min, servo6max)
 
 				// Reverse servos if required
 				if servo1reverse {
-					servo1 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo1
+					servo1 = servo1max + servo1min - servo1
 				}
 				if servo2reverse {
-					servo2 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo2
+					servo2 = servo2max + servo2min - servo2
 				}
 				if servo4reverse {
-					servo4 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo4
+					servo4 = servo4max + servo4min - servo4
 				}
 				if servo5reverse {
-					servo5 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo5
+					servo5 = servo5max + servo5min - servo5
 				}
 				if servo6reverse {
-					servo6 = MAX_PULSE_WIDTH_US + MIN_PULSE_WIDTH_US - servo6
+					servo6 = servo6max + servo6min - servo6
 				}
 
+				// Process servo midpoint trims
+				servo1 = servo1 + servo1trim - 1500
+				servo2 = servo2 + servo2trim - 1500
+				servo4 = servo4 + servo4trim - 1500
+				servo5 = servo5 + servo5trim - 1500
+				servo6 = servo6 + servo6trim - 1500
+
 				// Constrain pulse widths to a valid range.
-				servo1pulse := uint32(constrain(servo1, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				servo2pulse := uint32(constrain(servo2, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				servo4pulse := uint32(constrain(servo4, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				servo5pulse := uint32(constrain(servo5, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
-				servo6pulse := uint32(constrain(servo6, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US))
+				servo1pulse := uint32(constrain(servo1, servo1min, servo1max))
+				servo2pulse := uint32(constrain(servo2, servo2min, servo2max))
+				servo4pulse := uint32(constrain(servo4, servo4min, servo4max))
+				servo5pulse := uint32(constrain(servo5, servo5min, servo5max))
+				servo6pulse := uint32(constrain(servo6, servo6min, servo6max))
 
 				// Set the PWM signals for the servos
 				setServo(servo1pulse, servo2pulse, servo4pulse, servo5pulse, servo6pulse)
