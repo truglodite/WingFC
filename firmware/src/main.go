@@ -356,7 +356,10 @@ imuCheck:
 	// Keep outputs at neutral and ESC at zero
 	setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
 	setESC(MIN_PULSE_WIDTH_US)
+
+	setLED(7) // RGB for calibration
 	calibrate()
+	setLED(0) // OFF after calibration
 
 	// --- Watchdog Setup ---
 	watchdog.Configure(machine.WatchdogConfig{
