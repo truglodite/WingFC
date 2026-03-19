@@ -498,17 +498,17 @@ imuCheck:
 					servo1 = rollOutput
 					servo2 = pitchOutput
 					servo4 = yawOutput
-					servo5 = rollOutput
+					servo5 = -rollOutput
 				case 3: // Single aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
-					servo4 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
+					servo2 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
+					servo4 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
 					servo5 = 0
 				case 4: // Dual aileron V tail
 					servo1 = rollOutput
-					servo2 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
-					servo4 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
-					servo5 = rollOutput
+					servo2 = pitchOutput + yawOutput - NEUTRAL_RX_VALUE
+					servo4 = pitchOutput - yawOutput + NEUTRAL_RX_VALUE
+					servo5 = -rollOutput
 				default: // Elevon delta
 					servo1 = rollOutput + pitchOutput - NEUTRAL_RX_VALUE
 					servo2 = -rollOutput + pitchOutput + NEUTRAL_RX_VALUE
@@ -571,7 +571,6 @@ imuCheck:
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
 				default:
-
 				}
 				switch TuneParameterB {
 				case 1: // pitch P
@@ -581,7 +580,6 @@ imuCheck:
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
 				default:
-
 				}
 				switch TuneParameterC {
 				case 1: // pitch P
@@ -591,7 +589,6 @@ imuCheck:
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
 				default:
-
 				}
 				switch TuneParameterD {
 				case 1: // pitch P
@@ -601,7 +598,6 @@ imuCheck:
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
 				default:
-
 				}
 				// Print status and sensor data for debugging
 				// Adding these statements can lead to the control loop crashing to failsafe if higher packet rates are used.

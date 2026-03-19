@@ -17,7 +17,6 @@ const (
 
 // --- Aircraft Type ---
 const (
-	// Aircraft types
 	// 1 = Single aileron T tail
 	// 2 = Dual aileron T tail
 	// 3 = Single aileron V tail
@@ -73,16 +72,11 @@ const (
 // --- Servo Endpoints ---
 // default [1000,2000]
 const (
-	servo1min = 886
-	servo1max = 2114
-	servo2min = 989
-	servo2max = 2012
-	servo4min = 1080
-	servo4max = 2176
-	servo5min = 1000
-	servo5max = 2000
-	servo6min = 1000
-	servo6max = 2000
+	servo1min, servo1max = 886, 2114
+	servo2min, servo2max = 989, 2012
+	servo4min, servo4max = 1080, 2176
+	servo5min, servo5max = 1000, 2000
+	servo6min, servo6max = 1000, 2000
 )
 
 // --- Hardware Output Configuration ---
@@ -151,19 +145,8 @@ var (
 // DO NOT set any tuning parameter more than once!!!
 // TuneParameterXmax/min = max and min values available using full TuningChannelX range (988-2012)
 const (
-	TuneParameterA    = 1
-	TuneParameterAmin = 1.0
-	TuneParameterAmax = 3.0
-
-	TuneParameterB    = 2
-	TuneParameterBmin = 1.0
-	TuneParameterBmax = 3.0
-
-	TuneParameterC    = 3
-	TuneParameterCmin = 0.5
-	TuneParameterCmax = 2.0
-
-	TuneParameterD    = 0
-	TuneParameterDmin = 1.0
-	TuneParameterDmax = 3.0
+	TuneParameterA, TuneParameterAmin, TuneParameterAmax = 1, 1.0, 3.0
+	TuneParameterB, TuneParameterBmin, TuneParameterBmax = 2, 1.0, 3.0
+	TuneParameterC, TuneParameterCmin, TuneParameterCmax = 3, 0.5, 2.0
+	TuneParameterD, TuneParameterDmin, TuneParameterDmax = 0, 1.0, 3.0
 )
