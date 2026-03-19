@@ -83,15 +83,15 @@ const (
 	ESC_PWM_FREQUENCY = 50
 
 	// DShot ESC Configuration (default false)
-	// Set USE_DSHOT = true to enable DShot output, false to enable PWM output
+	// Set USE_DSHOT = true to use DShot esc output, false to use PWM esc output
 	USE_DSHOT = false
 
 	// DSHOT rate: 150, 300, 600, 1200 (kHz). (default 300)
-	// Please use <= 300... lower values are easier to bit-bang.
+	// Please use <= 300... lower values are easier to bit-bang and adequate for fixed wing.
 	DSHOT_RATE = 300
 
-	// Microseconds of deadband around neutral to use for control stick inputs (default 10)
-	DEADBAND = 10
+	// Microseconds of deadband around neutral to use for control stick inputs (default 3)
+	DEADBAND = 3
 
 	// RX output microseconds above which binary logic evaluates as true (arming and flight mode, default 1980)
 	HIGH_RX_VALUE = 1980
