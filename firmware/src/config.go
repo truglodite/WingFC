@@ -136,13 +136,14 @@ var (
 )
 
 // --- In Flight Tuning Parameters ---
-// TuneParameterX = Y
-// Y = 0:  (default)
-// Y = 1: Pitch P
-// Y = 2: Roll P
-// Y = 3: Yaw P
-// Y = 4: Pitch I
-// TuneParameterXmax/min = max and min values available throughout TuningChannelX range
+// In flight tune parameters override PID values set above.
+// TuneParameterX = Parameter to tune
+// 0: None (default)
+// 1: Pitch P
+// 2: Roll P
+// 3: Yaw P
+// 4: Pitch I
+// TuneParameterXmax/min = max and min values available using full TuningChannelX range (988-2012)
 const (
 	TuneParameterA    = 1
 	TuneParameterAmin = 1.0

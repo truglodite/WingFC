@@ -561,25 +561,25 @@ imuCheck:
 
 				switch TuneParameterA {
 				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterAmin), float64(TuneParameterAmax))
+					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
 				default:
 
 				}
 				switch TuneParameterB {
 				case 2: // roll P
-					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterBmin), float64(TuneParameterBmax))
+					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
 				default:
 
 				}
 				switch TuneParameterC {
 				case 3: // yaw P
-					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterCmin), float64(TuneParameterCmax))
+					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
 				default:
 
 				}
 				switch TuneParameterD {
 				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, float64(TuneParameterDmin), float64(TuneParameterDmax))
+					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
 				default:
 
 				}
