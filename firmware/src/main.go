@@ -224,7 +224,7 @@ servoCh6Init:
 		return
 	}
 	// set servos 1, 2, 4, 5, and 6 to subtrim values
-	setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+	setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
 	println("PWM configured for servos.")
 
 	// ESC init right away to avoid leaving some esc's in a bad state
@@ -571,7 +571,7 @@ imuCheck:
 				//println()
 
 			case FAILSAFE:
-				setServo(NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE, NEUTRAL_RX_VALUE)
+				setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
 				setESC(MIN_PULSE_WIDTH_US)
 				print(time.Now().UnixMilli())
 				println(" ---------------- Receiver failsafe")
