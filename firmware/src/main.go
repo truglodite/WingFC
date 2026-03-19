@@ -404,6 +404,9 @@ imuCheck:
 			switch flightState {
 
 			case FLIGHT_MODE:
+				//print("In")
+				//println(time.Now().UnixMilli())
+
 				// Switch to armed mode if CH5 is high
 				// Check for arm/disarm first every loop
 				if Channels[ArmChannel] <= HIGH_RX_VALUE {
@@ -609,7 +612,9 @@ imuCheck:
 
 				//println("Left, Right, ESC")
 				//println(leftPulse, rightPulse, escPulse)
-				//println()
+
+				//print("Out")
+				//println(time.Now().UnixMilli())
 
 			case FAILSAFE:
 				setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
