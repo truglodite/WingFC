@@ -42,7 +42,7 @@ var (
 	pitchPID       *PIDController
 	rollPID        *PIDController
 	yawPID         *PIDController
-	dt             = 0.01
+	dt             = 0.01 // flight loop timer (seconds)
 	kf             *KalmanFilter
 	imuData        IMU
 	imuYawMeas     float64
