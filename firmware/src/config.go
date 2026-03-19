@@ -59,24 +59,14 @@ const (
 	servo6reverse = false
 )
 
-// --- Servo Trim ---
-// default 1500
+// --- Servo Trim and Endpoints ---
+// [default] servoXmin, servoXtrim, servoXmax = 1000, 1500, 2000
 const (
-	servo1trim = 1498
-	servo2trim = 1498
-	servo4trim = 1500
-	servo5trim = 1500
-	servo6trim = 1500
-)
-
-// --- Servo Endpoints ---
-// default [1000,2000]
-const (
-	servo1min, servo1max = 886, 2114
-	servo2min, servo2max = 989, 2012
-	servo4min, servo4max = 1080, 2176
-	servo5min, servo5max = 1000, 2000
-	servo6min, servo6max = 1000, 2000
+	servo1min, servo1trim, servo1max = 886, 1498, 2114
+	servo2min, servo2trim, servo2max = 989, 1498, 2012
+	servo4min, servo4trim, servo4max = 1080, 1500, 2176
+	servo5min, servo5trim, servo5max = 1000, 1500, 2000
+	servo6min, servo6trim, servo6max = 1000, 1500, 2000
 )
 
 // --- Hardware Output Configuration ---
