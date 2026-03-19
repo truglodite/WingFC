@@ -479,9 +479,9 @@ imuCheck:
 				}
 
 				// Convert control outputs to servo pulse widths.
-				rollOutput = mapRange(float64(rollOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
-				pitchOutput = mapRange(float64(pitchOutput), -MAX_PITCH_RATE, MAX_PITCH_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
-				yawOutput = mapRange(float64(yawOutput), -MAX_YAW_RATE, MAX_YAW_RATE, float64(MIN_PULSE_WIDTH_US), float64(MAX_PULSE_WIDTH_US))
+				rollOutput = mapRange(float64(rollOutput), -MAX_ROLL_RATE, MAX_ROLL_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				pitchOutput = mapRange(float64(pitchOutput), -MAX_PITCH_RATE, MAX_PITCH_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
+				yawOutput = mapRange(float64(yawOutput), -MAX_YAW_RATE, MAX_YAW_RATE, MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US)
 
 				// Mix servos based on aircraft type configuration
 				var servo1, servo2, servo4, servo5, servo6 float64
