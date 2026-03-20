@@ -2,65 +2,65 @@ package main
 
 import (
 	"machine"
+	"runtime"
+	"runtime/interrupt"
 	"time"
+	_ "unsafe" // REQUIRED for go:linkname to work
 )
 
-// SendDShot sends a 16-bit DShot packet (11-bit throttle, 1-bit telemetry, 4-bit checksum)
-// over the ESC pin using bit-banged timing. This is a minimal implementation
-// intended for slower DShot rates (e.g., 150 or 300 kHz).
+// Import the internal nanotime function
+//
+//go:linkname nanotime runtime.nanotime
+func nanotime() int64
+
 func SendDShot(throttle uint16) {
-	if !USE_DSHOT {
-		return
-	}
 	if throttle > 2047 {
 		throttle = 2047
 	}
 
-	// Build packet: 11-bit throttle, 1-bit telemetry (0), 4-bit checksum
-	payload := uint32(throttle << 1) // telemetry bit = 0
-	// checksum: XOR of the three nibbles
+	// 1. Build Packet (11-bit throttle, 1-bit telemetry, 4-bit checksum)
+	payload := uint32(throttle << 1)
 	csum := uint32(0)
 	csum_data := payload
 	for i := 0; i < 3; i++ {
 		csum ^= (csum_data & 0xF)
 		csum_data >>= 4
 	}
-	csum &= 0xF
-	packet := (payload << 4) | csum
+	packet := (payload << 4) | (csum & 0xF)
 
-	// Timing calculation (nanoseconds per bit)
-	periodNs := int64(1000000000 / (DSHOT_RATE * 1000))
-	// High times for '1' and '0' (use ~67% and ~33%)
-	high1 := time.Duration(periodNs*75/100) * time.Nanosecond
-	high0 := time.Duration(periodNs*38/100) * time.Nanosecond
-	period := time.Duration(periodNs) * time.Nanosecond
+	// 2. Timing (DSHOT150 = 6666ns period)
+	const (
+		period = 6666
+		high1  = 5000 // 75%
+		high0  = 2500 // 37.5%
+	)
 
-	// Ensure ESC pin is configured as output
-	escPin.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	// 3. Safety: Lock OS thread and disable interrupts
+	runtime.LockOSThread()
+	mask := interrupt.Disable()
 
-	// Send 16-bit DSHOT packet (MSB first)
 	for bit := 15; bit >= 0; bit-- {
-		targetHigh := high0
+		targetHigh := int64(high0)
 		if ((packet >> uint(bit)) & 1) == 1 {
 			targetHigh = high1
 		}
 
-		// Start bit period
-		start := time.Now()
+		start := nanotime()
 		escPin.High()
-
-		// Busy-wait for High duration
-		for time.Since(start) < targetHigh {
+		// Busy-wait for high pulse
+		for (nanotime() - start) < targetHigh {
 		}
-		escPin.Low()
 
-		// Busy-wait for remainder of the Period
-		for time.Since(start) < period {
+		escPin.Low()
+		// Busy-wait for full bit period
+		for (nanotime() - start) < period {
 		}
 	}
 
-	// IMPORTANT: Inter-frame gap (Minimum 30us)
-	// This allows the ESC to process the frame before the next one starts.
+	interrupt.Restore(mask)
+	runtime.UnlockOSThread()
+
+	// Inter-frame gap (Minimum 30us)
 	time.Sleep(35 * time.Microsecond)
 }
 
