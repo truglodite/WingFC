@@ -1,6 +1,10 @@
 package main
 
-import "golang.org/x/exp/constraints"
+import (
+	"time"
+
+	"golang.org/x/exp/constraints"
+)
 
 // Read raw IMU data from the LSM6DS3TR sensor, remap for board orientation, and apply a low-pass filter.
 func readLSMData() {
@@ -153,6 +157,7 @@ func setESC(throttlePulse uint32) {
 			throttle = val
 		}
 		SendDShot(throttle)
+		time.Sleep(1 * time.Millisecond)
 		return
 	}
 

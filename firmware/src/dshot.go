@@ -4,21 +4,33 @@ import (
 	"machine"
 	"runtime"
 	"runtime/interrupt"
-	"time"
-	_ "unsafe" // REQUIRED for go:linkname to work
 )
 
-// Import the internal nanotime function
-//
-//go:linkname nanotime runtime.nanotime
-func nanotime() int64
+// CALIBRATION: Adjust these numbers until your scope shows 6.6µs total bit time.
+const (
+	// Previous (7.5µs total): 35 high + 10 low = 45 total (for '1')
+	// New target (6.6µs): Aiming for ~38 total units
+	countHigh1 = 30 // Reduced from 35
+	countLow1  = 8  // Reduced from 10
+
+	// Previous (7.5µs total): 15 high + 30 low = 45 total (for '0')
+	countHigh0 = 13 // Reduced from 15
+	countLow0  = 25 // Reduced from 30
+)
+
+// delay is a simple loop that the compiler cannot optimize away
+func delay(n int) {
+	for i := 0; i < n; i++ {
+		runtime.KeepAlive(i) // Forces the CPU to actually perform the loop
+	}
+}
 
 func SendDShot(throttle uint16) {
 	if throttle > 2047 {
 		throttle = 2047
 	}
 
-	// 1. Build Packet (11-bit throttle, 1-bit telemetry, 4-bit checksum)
+	// Build Packet (11-bit throttle, 1-bit telemetry, 4-bit checksum)
 	payload := uint32(throttle << 1)
 	csum := uint32(0)
 	csum_data := payload
@@ -28,46 +40,19 @@ func SendDShot(throttle uint16) {
 	}
 	packet := (payload << 4) | (csum & 0xF)
 
-	// 2. Timing (DSHOT150 = 6666ns period)
-	const (
-		period = 6666
-		high1  = 5000 // 75%
-		high0  = 2500 // 37.5%
-	)
-
-	// 3. Safety: Lock OS thread and disable interrupts
-	runtime.LockOSThread()
+	// Lock interrupts to prevent the 40µs "jitter"
 	mask := interrupt.Disable()
-
 	for bit := 15; bit >= 0; bit-- {
-		targetHigh := int64(high0)
+		machine.D2.High()
 		if ((packet >> uint(bit)) & 1) == 1 {
-			targetHigh = high1
-		}
-
-		start := nanotime()
-		escPin.High()
-		// Busy-wait for high pulse
-		for (nanotime() - start) < targetHigh {
-		}
-
-		escPin.Low()
-		// Busy-wait for full bit period
-		for (nanotime() - start) < period {
+			delay(countHigh1)
+			machine.D2.Low()
+			delay(countLow1)
+		} else {
+			delay(countHigh0)
+			machine.D2.Low()
+			delay(countLow0)
 		}
 	}
-
 	interrupt.Restore(mask)
-	runtime.UnlockOSThread()
-
-	// Inter-frame gap (Minimum 30us)
-	time.Sleep(35 * time.Microsecond)
-}
-
-// For tests or direct pin toggling (not used externally)
-func rawPulse(pin machine.Pin, high time.Duration, low time.Duration) {
-	pin.High()
-	time.Sleep(high)
-	pin.Low()
-	time.Sleep(low)
 }
