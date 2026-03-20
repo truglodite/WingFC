@@ -83,10 +83,10 @@ const (
 
 	// DShot ESC Configuration (default false)
 	// Set USE_DSHOT = true to use DShot esc output, false to use PWM esc output
+	// Connect DSHOT esc to pin D10.
 	USE_DSHOT = true
 
 	// DSHOT rate: 150, 300, 600, 1200 (kHz). (default 300)
-	// Please use <= 300... lower values are easier to bit-bang and adequate for fixed wing.
 	DSHOT_RATE = 150
 
 	// Microseconds of deadband around neutral to use for control stick inputs (default 3)

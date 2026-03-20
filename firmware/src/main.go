@@ -22,6 +22,7 @@ var (
 	redLED   = machine.LED_RED
 	greenLED = machine.LED_GREEN
 	blueLED  = machine.LED_BLUE
+	spi      = machine.SPI1
 
 	// PWM controllers and channels
 	pwm0         = machine.PWM0 // servos 1, 2, 4, and 5
@@ -88,10 +89,13 @@ const (
 	// --- Hardware Mappings ---
 	PWM_CH1_PIN = machine.D0 // Servo 1
 	PWM_CH2_PIN = machine.D1 // Servo 2
-	PWM_CH3_PIN = machine.D2 // ESC
+	PWM_CH3_PIN = machine.D2 // PWM ESC
 	PWM_CH4_PIN = machine.D3 // Servo 4
 	PWM_CH5_PIN = machine.D4 // Servo 5
 	PWM_CH6_PIN = machine.D5 // Servo 6
+	SPI_SCK     = machine.D8
+	SPI_MISO    = machine.D9
+	SPI_MOSI    = machine.D10 // DSHOT ESC
 
 	// Fail-safe constants
 	// for CSRF, we need to wait at least 1second
@@ -259,10 +263,25 @@ servoCh6Init:
 	retries = 0
 escInit:
 	if USE_DSHOT {
-		escPin = PWM_CH3_PIN
-		escPin.Configure(machine.PinConfig{Mode: machine.PinOutput}) // error checking is apparently not needed for PinConfig
-		setESC(MIN_PULSE_WIDTH_US)
-		println("DShot configured for ESC.")
+		SPIfreq := 600_000
+		switch DSHOT_RATE {
+		case 150:
+			SPIfreq = 600_000
+		case 300:
+			SPIfreq = 1_200_000
+		case 600:
+			SPIfreq = 2_400_000
+		case 1200:
+			SPIfreq = 4_800_000
+		default:
+			SPIfreq = 600_000
+		}
+		spi.Configure(machine.SPIConfig{
+			Frequency: uint32(SPIfreq), // For DShot150 (4 SPI bits per DShot bit)
+			Mode:      3,
+			SCK:       SPI_SCK,  // Clock pin
+			SDO:       SPI_MOSI, // MOSI → ESC signal
+		})
 	} else {
 		escPWMConfig := machine.PWMConfig{
 			Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,

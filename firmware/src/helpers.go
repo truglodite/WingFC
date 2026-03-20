@@ -142,6 +142,7 @@ func setServo(servo1pulse, servo2Pulse, servo4Pulse, servo5pulse, servo6pulse ui
 func setESC(throttlePulse uint32) {
 	if USE_DSHOT {
 		// Map pulse width (microseconds) to DShot throttle range (0..2047)
+		// 0 for disarm, 48-2047 throttle steps
 		var throttle uint16
 		if throttlePulse <= MIN_PULSE_WIDTH_US {
 			throttle = 0
