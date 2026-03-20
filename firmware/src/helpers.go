@@ -146,7 +146,7 @@ func setESC(throttlePulse uint32) {
 		if throttlePulse <= MIN_PULSE_WIDTH_US {
 			throttle = 0
 		} else {
-			val := uint16(mapRange(float64(throttlePulse), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 0, 2047))
+			val := uint16(mapRange(float64(throttlePulse), MIN_PULSE_WIDTH_US, MAX_PULSE_WIDTH_US, 48, 2047))
 			if val > 2047 {
 				val = 2047
 			}
