@@ -33,7 +33,7 @@ func (pid *PIDController) Update(currentError, xP, xI, xD, dt float64) float64 {
 	integral := xI * pid.integral
 
 	// Derivative term
-	derivative := pid.Kd * (currentError - pid.prevError) / dt
+	derivative := xD * (currentError - pid.prevError) / dt
 	pid.prevError = currentError
 
 	// Sum of all terms
