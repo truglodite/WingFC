@@ -134,11 +134,15 @@ var (
 // 7: Pitch D
 // 8: Roll D
 // 9: Yaw D
+// 10: Max Pitch Rate
+// 11: Max Roll Rate
+// 12: Max Yaw Rate
+// 13: PID Weight
 // DO NOT set any tuning parameter more than once!!!
 // TuneParameterXmax/min = max and min values available using full TuningChannelX range (988-2012)
 const (
 	TuneParameterA, TuneParameterAmin, TuneParameterAmax = 1, 1.0, 3.0
 	TuneParameterB, TuneParameterBmin, TuneParameterBmax = 2, 1.0, 3.0
 	TuneParameterC, TuneParameterCmin, TuneParameterCmax = 3, 0.5, 2.0
-	TuneParameterD, TuneParameterDmin, TuneParameterDmax = 0, 1.0, 3.0
+	TuneParameterD, TuneParameterDmin, TuneParameterDmax = 13, .2, 1.8
 )

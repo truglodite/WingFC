@@ -472,9 +472,9 @@ imuCheck:
 				// handle manual mode
 				if manualMode == false {
 					// Update PID controllers and get the control outputs.
-					pitchOutput = pitchPID.Update(pitchError, dt) * PID_WEIGHT
-					rollOutput = rollPID.Update(rollError, dt) * PID_WEIGHT
-					yawOutput = yawPID.Update(yawError, dt) * PID_WEIGHT
+					pitchOutput = pitchPID.Update(pitchError, pP, pI, pD, dt) * PID_WEIGHT
+					rollOutput = rollPID.Update(rollError, rP, rI, rD, dt) * PID_WEIGHT
+					yawOutput = yawPID.Update(yawError, yP, yI, yD, dt) * PID_WEIGHT
 				} else { // use rc inputs if in manual mode
 					pitchPID.Reset() // reset integral term in manual mode to prevent windup
 					rollPID.Reset()

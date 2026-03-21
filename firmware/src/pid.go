@@ -17,13 +17,20 @@ func NewPIDController(Kp, Ki, Kd float64) *PIDController {
 }
 
 // Update calculates the new control output.
-func (pid *PIDController) Update(currentError, dt float64) float64 {
+func (pid *PIDController) Update(currentError, xP, xI, xD, dt float64) float64 {
 	// Proportional term
-	proportional := pid.Kp * currentError
+	proportional := xP * currentError
 
 	// Integral term
 	pid.integral += currentError * dt
-	integral := pid.Ki * pid.integral
+	// Anti-windup clamp
+	const maxIntegral = 1000.0
+	if pid.integral > maxIntegral {
+		pid.integral = maxIntegral
+	} else if pid.integral < -maxIntegral {
+		pid.integral = -maxIntegral
+	}
+	integral := xI * pid.integral
 
 	// Derivative term
 	derivative := pid.Kd * (currentError - pid.prevError) / dt
