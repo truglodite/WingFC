@@ -600,6 +600,8 @@ imuCheck:
 					rP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
 				case 3: // yaw P
 					yP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+				case 13: // yaw P
+					PID_WEIGHT = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
 				default:
 				}
 				// Print status and sensor data for debugging

@@ -97,7 +97,7 @@ const (
 )
 
 // --- Flight Control Parameters ---
-const (
+var (
 	// Maximum desired pitch rate in degrees/sec (default 200)
 	MAX_PITCH_RATE_DEG = 200
 
@@ -112,9 +112,7 @@ const (
 
 	// LPF alpha for gyro/accel fusion (default 0.2)
 	LPF_ALPHA = 0.2
-)
 
-var (
 	// PID gains (P, I, D) for the roll, pitch, and yaw controllers
 	pP, pI, pD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
 	rP, rI, rD = 2., 0.5, 0.01  // default 2., 0.5, 0.01
