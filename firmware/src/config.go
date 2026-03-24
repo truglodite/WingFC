@@ -83,7 +83,7 @@ const (
 
 	// DShot ESC Configuration (default false)
 	// Set USE_DSHOT = true to use DShot esc output, false to use PWM esc output
-	USE_DSHOT = true
+	USE_DSHOT = false
 
 	// DSHOT rate: 150, 300, 600, 1200 (kHz). (default 300)
 	// Please use <= 300... lower values are easier to bit-bang and adequate for fixed wing.
@@ -99,13 +99,13 @@ const (
 // --- Flight Control Parameters ---
 var (
 	// Maximum desired pitch rate in degrees/sec (default 200)
-	MAX_PITCH_RATE_DEG = 200
+	MAX_PITCH_RATE_DEG float64 = 200
 
 	// Maximum desired roll rate in degrees/sec (default 500)
-	MAX_ROLL_RATE_DEG = 500
+	MAX_ROLL_RATE_DEG float64 = 500
 
 	// Maximum desired yaw rate in degrees/sec (default 100)
-	MAX_YAW_RATE_DEG = 100
+	MAX_YAW_RATE_DEG float64 = 100
 
 	// Weighting for combining gyro/accel with input (default 0.5)
 	PID_WEIGHT = .7

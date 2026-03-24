@@ -56,6 +56,11 @@ var (
 	desiredPitchRate, desiredRollRate, desiredYawRate                   float64
 	pitchOutput, rollOutput, yawOutput                                  float64
 
+	// Calculated constants for PID control
+	MAX_ROLL_RATE  = MAX_ROLL_RATE_DEG * math.Pi / 180
+	MAX_PITCH_RATE = MAX_PITCH_RATE_DEG * math.Pi / 180
+	MAX_YAW_RATE   = MAX_YAW_RATE_DEG * math.Pi / 180
+
 	// RC Channels
 	Channels        [NumChannels]uint16
 	lastFlightState flightState
@@ -79,11 +84,6 @@ const (
 	MIN_RX_VALUE     = 988
 	MAX_RX_VALUE     = 2012
 	NEUTRAL_RX_VALUE = 1500
-
-	// Calculated constants for PID control
-	MAX_ROLL_RATE  = MAX_ROLL_RATE_DEG * math.Pi / 180
-	MAX_PITCH_RATE = MAX_PITCH_RATE_DEG * math.Pi / 180
-	MAX_YAW_RATE   = MAX_YAW_RATE_DEG * math.Pi / 180
 
 	// --- Hardware Mappings ---
 	PWM_CH1_PIN = machine.D0 // Servo 1
@@ -565,45 +565,8 @@ imuCheck:
 				}
 				setESC(escPulse)
 
-				// Handle in flight tuning
-				switch TuneParameterA {
-				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
-				case 2: // roll P
-					rP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
-				case 3: // yaw P
-					yP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
-				default:
-				}
-				switch TuneParameterB {
-				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
-				case 2: // roll P
-					rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
-				case 3: // yaw P
-					yP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
-				default:
-				}
-				switch TuneParameterC {
-				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
-				case 2: // roll P
-					rP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
-				case 3: // yaw P
-					yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
-				default:
-				}
-				switch TuneParameterD {
-				case 1: // pitch P
-					pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
-				case 2: // roll P
-					rP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
-				case 3: // yaw P
-					yP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
-				case 13: // yaw P
-					PID_WEIGHT = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
-				default:
-				}
+				updateTuning()
+
 				// Print status and sensor data for debugging
 				// Adding these statements can lead to the control loop crashing to failsafe if higher packet rates are used.
 				//println("    Pin       ,    Pout      ,    Rin       ,     Rout     , armed")

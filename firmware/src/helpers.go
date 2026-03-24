@@ -202,3 +202,138 @@ func setLED(color uint8) {
 		blueLED.Low()
 	}
 }
+
+// Function to handle in flight tuning
+
+// 0: None (default)
+// 1: Pitch P
+// 2: Roll P
+// 3: Yaw P
+// 4: Pitch I
+// 5: Roll I
+// 6: Yaw I
+// 7: Pitch D
+// 8: Roll D
+// 9: Yaw D
+// 10: Max Pitch Rate
+// 11: Max Roll Rate
+// 12: Max Yaw Rate
+// 13: PID Weight
+func updateTuning() {
+	switch TuneParameterA {
+	case 1: // pitch P
+		pP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 2: // roll P
+		rP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 3: // yaw P
+		yP = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 4: // pitch I
+		pI = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 5: // roll I
+		rI = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 6: // yaw I
+		yI = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 7: // pitch D
+		pD = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 8: // roll I
+		rD = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 9: // yaw I
+		yD = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 10: // pitch rate
+		MAX_PITCH_RATE_DEG = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 11: // roll rate
+		MAX_ROLL_RATE_DEG = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 12: // yaw rate
+		MAX_YAW_RATE_DEG = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	case 13: // pid weight
+		PID_WEIGHT = mapRange(float64(Channels[TuningChannelA]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterAmin, TuneParameterAmax)
+	default:
+	}
+	switch TuneParameterB {
+	case 1: // pitch P
+		pP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 2: // roll P
+		rP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 3: // yaw P
+		yP = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 4: // pitch I
+		pI = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 5: // roll I
+		rI = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 6: // yaw I
+		yI = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 7: // pitch D
+		pD = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 8: // roll I
+		rD = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 9: // yaw I
+		yD = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 10: // pitch rate
+		MAX_PITCH_RATE_DEG = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 11: // roll rate
+		MAX_ROLL_RATE_DEG = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 12: // yaw rate
+		MAX_YAW_RATE_DEG = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	case 13: // pid weight
+		PID_WEIGHT = mapRange(float64(Channels[TuningChannelB]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterBmin, TuneParameterBmax)
+	default:
+	}
+	switch TuneParameterC {
+	case 1: // pitch P
+		pP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 2: // roll P
+		rP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 3: // yaw P
+		yP = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 4: // pitch I
+		pI = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 5: // roll I
+		rI = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 6: // yaw I
+		yI = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 7: // pitch D
+		pD = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 8: // roll I
+		rD = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 9: // yaw I
+		yD = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 10: // pitch rate
+		MAX_PITCH_RATE_DEG = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 11: // roll rate
+		MAX_ROLL_RATE_DEG = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 12: // yaw rate
+		MAX_YAW_RATE_DEG = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	case 13: // pid weight
+		PID_WEIGHT = mapRange(float64(Channels[TuningChannelC]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterCmin, TuneParameterCmax)
+	default:
+	}
+	switch TuneParameterD {
+	case 1: // pitch P
+		pP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 2: // roll P
+		rP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 3: // yaw P
+		yP = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 4: // pitch I
+		pI = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 5: // roll I
+		rI = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 6: // yaw I
+		yI = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 7: // pitch D
+		pD = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 8: // roll I
+		rD = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 9: // yaw I
+		yD = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 10: // pitch rate
+		MAX_PITCH_RATE_DEG = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 11: // roll rate
+		MAX_ROLL_RATE_DEG = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 12: // yaw rate
+		MAX_YAW_RATE_DEG = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	case 13: // yaw P
+		PID_WEIGHT = mapRange(float64(Channels[TuningChannelD]), MIN_RX_VALUE, MAX_RX_VALUE, TuneParameterDmin, TuneParameterDmax)
+	default:
+	}
+}
