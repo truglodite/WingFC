@@ -64,7 +64,7 @@ func readReceiver(packetChan chan<- [CRSF_PACKET_SIZE]byte) {
 
 	for {
 
-		if uart.Buffered() <= CRSF_PACKET_SIZE {
+		if uart.Buffered() <= CRSF_PACKET_SIZE { // use while to free up scheduling?
 			// wait for full packet in buffer
 			// removing this delay seems to reduce crc errors, but results in reboot during failsafe test.
 			time.Sleep(250 * time.Microsecond) // Not sure if we need to delay further if we wait for ~64 byte buffer

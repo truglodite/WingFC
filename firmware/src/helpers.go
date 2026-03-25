@@ -204,7 +204,6 @@ func setLED(color uint8) {
 }
 
 // Function to handle in flight tuning
-
 // 0: None (default)
 // 1: Pitch P
 // 2: Roll P

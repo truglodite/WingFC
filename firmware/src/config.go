@@ -98,6 +98,7 @@ const (
 
 // --- Flight Control Parameters ---
 var (
+	// Warning, parameters that are setup for in flight tuning will be overwritten accordingly.
 	// Maximum desired pitch rate in degrees/sec (default 200)
 	MAX_PITCH_RATE_DEG float64 = 200
 
@@ -139,8 +140,8 @@ var (
 // DO NOT set any tuning parameter more than once!!!
 // TuneParameterXmax/min = max and min values available using full TuningChannelX range (988-2012)
 const (
-	TuneParameterA, TuneParameterAmin, TuneParameterAmax = 1, 1.0, 3.0
-	TuneParameterB, TuneParameterBmin, TuneParameterBmax = 2, 1.0, 3.0
-	TuneParameterC, TuneParameterCmin, TuneParameterCmax = 3, 0.5, 2.0
-	TuneParameterD, TuneParameterDmin, TuneParameterDmax = 13, .2, 1.8
+	TuneParameterA, TuneParameterAmin, TuneParameterAmax = 1, 0.5, 1.5
+	TuneParameterB, TuneParameterBmin, TuneParameterBmax = 2, 0.5, 1.5
+	TuneParameterC, TuneParameterCmin, TuneParameterCmax = 3, 0.2, 1.0
+	TuneParameterD, TuneParameterDmin, TuneParameterDmax = 10, 200, 500
 )
