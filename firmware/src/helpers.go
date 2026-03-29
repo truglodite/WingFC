@@ -164,45 +164,6 @@ func setESC(throttlePulse uint32) {
 	pwm1.Set(pwmCh3, duty)
 }
 
-// setLED sets the output state of the built in RGB LED.
-// High() each color off.
-func setLED(color uint8) {
-	switch color {
-	case 0: // off
-		redLED.High()
-		greenLED.High()
-		blueLED.High()
-	case 1: // R
-		redLED.Low()
-		greenLED.High()
-		blueLED.High()
-	case 2: // G
-		redLED.High()
-		greenLED.Low()
-		blueLED.High()
-	case 3: // B
-		redLED.High()
-		greenLED.High()
-		blueLED.Low()
-	case 4: // RG
-		redLED.Low()
-		greenLED.Low()
-		blueLED.High()
-	case 5: // RB
-		redLED.Low()
-		greenLED.High()
-		blueLED.Low()
-	case 6: // GB
-		redLED.High()
-		greenLED.Low()
-		blueLED.Low()
-	case 7: // RGB
-		redLED.Low()
-		greenLED.Low()
-		blueLED.Low()
-	}
-}
-
 // Function to handle in flight tuning
 // 0: None (default)
 // 1: Pitch P
