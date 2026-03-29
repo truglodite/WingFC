@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"tinygo.org/x/drivers/lsm6ds3tr"
-	"tinygo.org/x/drivers/ws2812"
 )
 
 // Version of the flight controller software.
@@ -115,13 +114,11 @@ func main() {
 	println("Initializing...")
 
 	// configure the onboard RGB LED (Low=on, High=off)
-	pin := machine.D10
-	pin.Configure(machine.PinConfig{Mode: machine.PinOutput})
-	neo := ws2812.New(pin)
-	led := LEDController{
-		neo:   neo,
-		state: LEDOFF,
-	}
+	redLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	greenLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	blueLED.Configure(machine.PinConfig{Mode: machine.PinOutput})
+	ledController.state = LEDOFF
+	ledController.updateLED()
 
 	// --- Hardware Setup ---
 	uart.Configure(machine.UARTConfig{
@@ -131,8 +128,8 @@ func main() {
 	})
 	println("UART configured for receiver.")
 
-	led.SetState(PWMCONFIG)
-	led.updateLED()
+	ledController.state = PWMCONFIG
+	ledController.updateLED()
 	var retries = 0
 
 servoPWM0Init:
@@ -140,8 +137,8 @@ servoPWM0Init:
 		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY_0,
 	}
 	if err := pwm0.Configure(servoPWM0Config); err != nil {
-		led.SetState(PWMERROR)
-		led.updateLED()
+		ledController.state = PWMERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -153,15 +150,15 @@ servoPWM0Init:
 	}
 
 	// Reset retries for the next component
-	led.SetState(SERVOINIT)
-	led.updateLED()
+	ledController.state = SERVOINIT
+	ledController.updateLED()
 	retries = 0
 servoCh1Init:
 	pwm0periodNs = servoPWM0Config.Period
 	pwmCh1, err = pwm0.Channel(PWM_CH1_PIN)
 	if err != nil {
-		led.SetState(SERVOERROR)
-		led.updateLED()
+		ledController.state = SERVOERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -172,14 +169,14 @@ servoCh1Init:
 		return
 	}
 	// Reset retries for the next component
-	led.SetState(SERVOINIT)
-	led.updateLED()
+	ledController.state = SERVOINIT
+	ledController.updateLED()
 	retries = 0
 servoCh2Init:
 	pwmCh2, err = pwm0.Channel(PWM_CH2_PIN)
 	if err != nil {
-		led.SetState(SERVOERROR)
-		led.updateLED()
+		ledController.state = SERVOERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -190,14 +187,14 @@ servoCh2Init:
 		return
 	}
 	// Reset retries for the next component
-	led.SetState(SERVOINIT)
-	led.updateLED()
+	ledController.state = SERVOINIT
+	ledController.updateLED()
 	retries = 0
 servoCh4Init:
 	pwmCh4, err = pwm0.Channel(PWM_CH4_PIN)
 	if err != nil {
-		led.SetState(SERVOERROR)
-		led.updateLED()
+		ledController.state = SERVOERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -208,14 +205,14 @@ servoCh4Init:
 		return
 	}
 	// Reset retries for the next component
-	led.SetState(SERVOINIT)
-	led.updateLED()
+	ledController.state = SERVOINIT
+	ledController.updateLED()
 	retries = 0
 servoCh5Init:
 	pwmCh5, err = pwm0.Channel(PWM_CH5_PIN)
 	if err != nil {
-		led.SetState(SERVOERROR)
-		led.updateLED()
+		ledController.state = SERVOERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -226,8 +223,8 @@ servoCh5Init:
 		return
 	}
 
-	led.SetState(PWMCONFIG)
-	led.updateLED()
+	ledController.state = PWMCONFIG
+	ledController.updateLED()
 	retries = 0
 
 servoPWM2Init:
@@ -235,8 +232,8 @@ servoPWM2Init:
 		Period: machine.GHz * 1 / SERVO_PWM_FREQUENCY_2,
 	}
 	if err := pwm0.Configure(servoPWM2Config); err != nil {
-		led.SetState(PWMERROR)
-		led.updateLED()
+		ledController.state = PWMERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -247,15 +244,15 @@ servoPWM2Init:
 		return
 	}
 
-	led.SetState(SERVOINIT)
-	led.updateLED()
+	ledController.state = SERVOINIT
+	ledController.updateLED()
 	retries = 0
 servoCh6Init:
 	pwm2periodNs = servoPWM2Config.Period
 	pwmCh6, err = pwm2.Channel(PWM_CH6_PIN)
 	if err != nil {
-		led.SetState(SERVOERROR)
-		led.updateLED()
+		ledController.state = SERVOERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -271,8 +268,8 @@ servoCh6Init:
 
 	// ESC init right away to avoid leaving some esc's in a bad state
 	// Reset retries for the next component
-	led.SetState(ESCINIT)
-	led.updateLED()
+	ledController.state = ESCINIT
+	ledController.updateLED()
 	retries = 0
 escInit:
 	if USE_DSHOT {
@@ -285,8 +282,8 @@ escInit:
 			Period: machine.GHz * 1 / ESC_PWM_FREQUENCY,
 		}
 		if err = pwm1.Configure(escPWMConfig); err != nil {
-			led.SetState(ESCERROR)
-			led.updateLED()
+			ledController.state = ESCERROR
+			ledController.updateLED()
 			retries++
 			if retries < 5 {
 				time.Sleep(100 * time.Millisecond)
@@ -299,8 +296,8 @@ escInit:
 		escPeriodNs = escPWMConfig.Period
 		pwmCh3, err = pwm1.Channel(PWM_CH3_PIN)
 		if err != nil {
-			led.SetState(ESCERROR)
-			led.updateLED()
+			ledController.state = ESCERROR
+			ledController.updateLED()
 			retries++
 			if retries < 5 {
 				time.Sleep(100 * time.Millisecond)
@@ -319,8 +316,8 @@ escInit:
 		Frequency: 400 * machine.KHz,
 	})
 	println("I2C configured for IMU.")
-	led.SetState(IMUCONFIG)
-	led.updateLED()
+	ledController.state = IMUCONFIG
+	ledController.updateLED()
 	retries = 0
 
 	// --- IMU Setup ---
@@ -334,8 +331,8 @@ imuInit:
 	})
 	if err != nil {
 		retries++
-		led.SetState(IMUERROR)
-		led.updateLED()
+		ledController.state = IMUERROR
+		ledController.updateLED()
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
 			goto imuInit
@@ -345,14 +342,14 @@ imuInit:
 		return
 	}
 	// Reset retries for the next component
-	led.SetState(IMUINIT)
-	led.updateLED()
+	ledController.state = IMUINIT
+	ledController.updateLED()
 	retries = 0
 
 imuCheck:
 	if !lsm.Connected() {
-		led.SetState(IMUERROR)
-		led.updateLED()
+		ledController.state = IMUERROR
+		ledController.updateLED()
 		retries++
 		if retries < 5 {
 			time.Sleep(100 * time.Millisecond)
@@ -363,8 +360,8 @@ imuCheck:
 		return
 	}
 
-	led.SetState(LEDOFF)
-	led.updateLED()
+	ledController.state = LEDOFF
+	ledController.updateLED()
 
 	println("LSM6DS3TR IMU configured and initialized.")
 
@@ -382,11 +379,11 @@ imuCheck:
 	setServo(servo1trim, servo2trim, servo4trim, servo5trim, servo6trim)
 	setESC(MIN_PULSE_WIDTH_US)
 
-	led.SetState(CALIBRATE)
-	led.updateLED()
+	ledController.state = CALIBRATE
+	ledController.updateLED()
 	calibrate()
-	led.SetState(LEDOFF)
-	led.updateLED()
+	ledController.state = LEDOFF
+	ledController.updateLED()
 
 	// --- Watchdog Setup ---
 	watchdog.Configure(machine.WatchdogConfig{
@@ -441,13 +438,13 @@ imuCheck:
 				// Check for arm/disarm first every loop
 				if Channels[ArmChannel] <= HIGH_RX_VALUE {
 					//println("Disarmed.")
-					led.SetState(DISARMED)
-					led.updateLED()
+					ledController.state = DISARMED
+					ledController.updateLED()
 					armed = false
 				} else {
 					//println("Armed!")
-					led.SetState(ARMED)
-					led.updateLED()
+					ledController.state = ARMED
+					ledController.updateLED()
 					armed = true
 				}
 
@@ -614,8 +611,8 @@ imuCheck:
 				setESC(MIN_PULSE_WIDTH_US)
 				print(time.Now().UnixMilli())
 				println(" ---------------- Receiver failsafe")
-				led.SetState(FAILSAFED)
-				led.updateLED()
+				ledController.state = FAILSAFED
+				ledController.updateLED()
 				if time.Since(LastPacketTime).Milliseconds() <= FAILSAFE_TIMEOUT_MS {
 					lastFlightState = flightState
 					flightState = FLIGHT_MODE

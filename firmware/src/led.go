@@ -1,6 +1,6 @@
 package main
 
-import "tinygo.org/x/drivers/ws2812"
+import "machine"
 
 type LEDState int
 
@@ -23,51 +23,72 @@ const (
 
 // LEDController handles the onboard RGB LED
 type LEDController struct {
-	neo   ws2812.Device
 	state LEDState
 }
 
-// SetState safely updates LED state
-func (l *LEDController) SetState(s LEDState) {
-	l.state = s
-}
+var ledController LEDController
+
+var redLED = machine.LED_RED
+var greenLED = machine.LED_GREEN
+var blueLED = machine.LED_BLUE
 
 func (l *LEDController) updateLED() {
 	switch l.state {
 	case LEDOFF:
-		l.setColor(0, 0, 0)
+		redLED.High()
+		greenLED.High()
+		blueLED.High()
 	case PWMCONFIG: // R
-		l.setColor(255, 0, 0)
+		redLED.Low()
+		greenLED.High()
+		blueLED.High()
 	case PWMERROR: // RG
-		l.setColor(255, 255, 0)
+		redLED.Low()
+		greenLED.Low()
+		blueLED.High()
 	case SERVOINIT: // G
-		l.setColor(0, 255, 0)
+		redLED.High()
+		greenLED.Low()
+		blueLED.High()
 	case SERVOERROR: // GB
-		l.setColor(0, 255, 255)
+		redLED.High()
+		greenLED.Low()
+		blueLED.Low()
 	case ESCINIT: // R
-		l.setColor(255, 0, 0)
+		redLED.Low()
+		greenLED.High()
+		blueLED.High()
 	case ESCERROR: // RGB
-		l.setColor(255, 255, 255)
+		redLED.Low()
+		greenLED.Low()
+		blueLED.Low()
 	case IMUCONFIG: // B
-		l.setColor(0, 0, 255)
+		redLED.High()
+		greenLED.High()
+		blueLED.Low()
 	case IMUINIT: // R
-		l.setColor(255, 0, 0)
+		redLED.Low()
+		greenLED.High()
+		blueLED.High()
 	case IMUERROR: // RB
-		l.setColor(255, 0, 255)
+		redLED.Low()
+		greenLED.High()
+		blueLED.Low()
 	case CALIBRATE: // RGB
-		l.setColor(255, 255, 255)
+		redLED.Low()
+		greenLED.Low()
+		blueLED.Low()
 	case DISARMED: // G
-		l.setColor(0, 255, 0)
+		redLED.High()
+		greenLED.Low()
+		blueLED.High()
 	case ARMED: // B
-		l.setColor(0, 0, 255)
+		redLED.High()
+		greenLED.High()
+		blueLED.Low()
 	case FAILSAFED: // R
-		l.setColor(255, 0, 0)
+		redLED.Low()
+		greenLED.High()
+		blueLED.High()
 	}
-}
-
-// Set RGB color (WS2812 uses GRB order)
-func (l *LEDController) setColor(r, g, b uint8) {
-	l.neo.WriteByte(g)
-	l.neo.WriteByte(r)
-	l.neo.WriteByte(b)
 }
